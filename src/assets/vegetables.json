@@ -1,0 +1,428 @@
+[
+  {
+    "name": "Carrot",
+    "name_kh": "ការុត",
+    "description": "Root vegetable, typically orange in color, rich in beta-carotene and fiber",
+    "image": "vegetables/carrot.jpg",
+    "scientific_name": "Daucus carota subsp. sativus"
+  },
+  {
+    "name": "Broccoli",
+    "name_kh": "ប្រូកូលី",
+    "description": "Green cruciferous vegetable with tree-like clusters, high in vitamins C and K",
+    "image": "vegetables/broccoli.jpg",
+    "scientific_name": "Brassica oleracea var. italica"
+  },
+  {
+    "name": "Spinach",
+    "name_kh": "ស្ពៃចង្កឹះ", 
+    "description": "Leafy green vegetable packed with iron and antioxidants",
+    "image": "vegetables/spinach.jpg",
+    "scientific_name": "Spinacia oleracea"
+  },
+  {
+    "name": "Kale",
+    "name_kh": "សាលាត ខាល" ,
+    "description": "Nutrient-dense leafy green with high vitamin K content",
+    "image": "vegetables/kale.jpg",
+    "scientific_name": "Brassica oleracea var. sabellica"
+  },
+  {
+    "name": "Bell Pepper",
+    "name_kh" : "ម្ទេសផ្លោត" ,
+    "description": "Sweet, crunchy vegetable available in various colors, rich in vitamin C",
+    "image": "vegetables/bell-pepper.jpg",
+    "scientific_name": "Capsicum annuum"
+  },
+  {
+    "name": "Tomato",
+    "name_kh" : "ប៉េងប៉ោះ" ,
+    "description": "Red fruit often used as vegetable, contains lycopene antioxidant",
+    "image": "vegetables/tomato.jpg",
+    "scientific_name": "Solanum lycopersicum"
+  },
+  {
+    "name": "Cucumber",
+    "name_kh": "ត្រសក់",
+    "description": "Refreshing, water-rich vegetable with mild flavor",
+    "image": "vegetables/cucumber.jpg",
+    "scientific_name": "Cucumis sativus"
+  },
+  {
+    "name": "Zucchini",
+    "description": "Summer squash with tender skin and mild flavor",
+    "image": "vegetables/zucchini.jpg",
+    "scientific_name": "Cucurbita pepo"
+  },
+  {
+    "name": "Eggplant",
+    "name_kh": "ទ្រព្យវែង",
+    "description": "Purple-skinned vegetable with spongy texture, rich in nasunin",
+    "image": "vegetables/eggplant.jpg",
+    "scientific_name": "Solanum melongena"
+  },
+  {
+    "name": "Sweet Potato",
+    "name_kh": "ដំឡូងផ្អែម",
+    "description": "Nutritious tuber with orange flesh, high in vitamin A",
+    "image": "vegetables/sweet-potato.jpg",
+    "scientific_name": "Ipomoea batatas"
+  },
+  {
+    "name": "Cauliflower",
+    "name_kh": "ផ្កាខាត់ណា",
+    "description": "White cruciferous vegetable, versatile and low in calories",
+    "image": "vegetables/cauliflower.jpg",
+    "scientific_name": "Brassica oleracea var. botrytis"
+  },
+  {
+    "name": "Cabbage",
+    "name_kh": "ស្ពៃក្ដោប",
+    "description": "Leafy vegetable with dense heads, rich in vitamin C and K",
+    "image": "vegetables/cabbage.jpg",
+    "scientific_name": "Brassica oleracea var. capitata"
+  },
+  {
+    "name": "Lettuce",
+    "name_kh": "សាលាត",
+    "description": "Leafy green commonly used in salads, high in water content",
+    "image": "vegetables/lettuce.jpg",
+    "scientific_name": "Lactuca sativa"
+  },
+  {
+    "name": "Onion",
+    "description": "Bulb vegetable with pungent flavor, rich in antioxidants",
+    "image": "vegetables/onion.jpg",
+    "scientific_name": "Allium cepa"
+  },
+  {
+    "name": "Garlic",
+    "description": "Bulb vegetable with strong flavor, known for its medicinal properties",
+    "image": "vegetables/garlic.jpg",
+    "scientific_name": "Allium sativum"
+  },
+  {
+    "name": "Potato",
+    "description": "Starchy tuber, versatile staple food worldwide",
+    "image": "vegetables/potato.jpg",
+    "scientific_name": "Solanum tuberosum"
+  },
+  {
+    "name": "Pumpkin",
+    "description": "Winter squash with thick orange skin, rich in vitamin A",
+    "image": "vegetables/pumpkin.jpg",
+    "scientific_name": "Cucurbita pepo"
+  },
+  {
+    "name": "Butternut Squash",
+    "description": "Sweet winter squash with tan skin and orange flesh",
+    "image": "vegetables/butternut-squash.jpg",
+    "scientific_name": "Cucurbita moschata"
+  },
+  {
+    "name": "Green Beans",
+    "description": "Long, slender pods with immature seeds, rich in fiber",
+    "image": "vegetables/green-beans.jpg",
+    "scientific_name": "Phaseolus vulgaris"
+  },
+  {
+    "name": "Peas",
+    "description": "Small spherical seeds from pods, high in protein and fiber",
+    "image": "vegetables/peas.jpg",
+    "scientific_name": "Pisum sativum"
+  },
+  {
+    "name": "Corn",
+    "description": "Sweet yellow kernels on a cob, rich in carbohydrates",
+    "image": "vegetables/corn.jpg",
+    "scientific_name": "Zea mays"
+  },
+  {
+    "name": "Radish",
+    "description": "Root vegetable with crisp texture and peppery flavor",
+    "image": "vegetables/radish.jpg",
+    "scientific_name": "Raphanus sativus"
+  },
+  {
+    "name": "Beetroot",
+    "description": "Deep red root vegetable, rich in nitrates and antioxidants",
+    "image": "vegetables/beetroot.jpg",
+    "scientific_name": "Beta vulgaris"
+  },
+  {
+    "name": "Turnip",
+    "description": "Root vegetable with white and purple skin, mild flavor",
+    "image": "vegetables/turnip.jpg",
+    "scientific_name": "Brassica rapa subsp. rapa"
+  },
+  {
+    "name": "Parsnip",
+    "description": "Cream-colored root vegetable, sweet and nutty flavor",
+    "image": "vegetables/parsnip.jpg",
+    "scientific_name": "Pastinaca sativa"
+  },
+  {
+    "name": "Celery",
+    "description": "Crisp stalk vegetable with high water content",
+    "image": "vegetables/celery.jpg",
+    "scientific_name": "Apium graveolens"
+  },
+  {
+    "name": "Fennel",
+    "description": "Bulb vegetable with licorice-like flavor, rich in vitamin C",
+    "image": "vegetables/fennel.jpg",
+    "scientific_name": "Foeniculum vulgare"
+  },
+  {
+    "name": "Artichoke",
+    "description": "Thistle-like vegetable with edible flower buds",
+    "image": "vegetables/artichoke.jpg",
+    "scientific_name": "Cynara cardunculus var. scolymus"
+  },
+  {
+    "name": "Asparagus",
+    "description": "Tender green spears, rich in folate and vitamin K",
+    "image": "vegetables/asparagus.jpg",
+    "scientific_name": "Asparagus officinalis"
+  },
+  {
+    "name": "Brussels Sprouts",
+    "description": "Miniature cabbage-like vegetables, high in vitamin C",
+    "image": "vegetables/brussels-sprouts.jpg",
+    "scientific_name": "Brassica oleracea var. gemmifera"
+  },
+  {
+    "name": "Leek",
+    "description": "Mild-flavored vegetable related to onion and garlic",
+    "image": "vegetables/leek.jpg",
+    "scientific_name": "Allium ampeloprasum var. porrum"
+  },
+  {
+    "name": "Shallot",
+    "description": "Small bulb vegetable with delicate onion flavor",
+    "image": "vegetables/shallot.jpg",
+    "scientific_name": "Allium cepa var. aggregatum"
+  },
+  {
+    "name": "Okra",
+    "description": "Green pod vegetable with mucilaginous texture",
+    "image": "vegetables/okra.jpg",
+    "scientific_name": "Abelmoschus esculentus"
+  },
+  {
+    "name": "Bok Choy",
+    "description": "Chinese cabbage with dark green leaves and white stalks",
+    "image": "vegetables/bok-choy.jpg",
+    "scientific_name": "Brassica rapa subsp. chinensis"
+  },
+  {
+    "name": "Swiss Chard",
+    "description": "Leafy green with colorful stalks, rich in vitamin K",
+    "image": "vegetables/swiss-chard.jpg",
+    "scientific_name": "Beta vulgaris subsp. vulgaris"
+  },
+  {
+    "name": "Collard Greens",
+    "description": "Dark leafy green vegetable, high in calcium",
+    "image": "vegetables/collard-greens.jpg",
+    "scientific_name": "Brassica oleracea var. viridis"
+  },
+  {
+    "name": "Endive",
+    "description": "Leafy vegetable with slightly bitter flavor",
+    "image": "vegetables/endive.jpg",
+    "scientific_name": "Cichorium endivia"
+  },
+  {
+    "name": "Arugula",
+    "description": "Peppery leafy green, rich in nitrates",
+    "image": "vegetables/arugula.jpg",
+    "scientific_name": "Eruca vesicaria"
+  },
+  {
+    "name": "Watercress",
+    "description": "Aquatic leafy green with peppery flavor",
+    "image": "vegetables/watercress.jpg",
+    "scientific_name": "Nasturtium officinale"
+  },
+  {
+    "name": "Radicchio",
+    "description": "Red-leafed chicory with bitter flavor",
+    "image": "vegetables/radicchio.jpg",
+    "scientific_name": "Cichorium intybus var. foliosum"
+  },
+  {
+    "name": "Mustard Greens",
+    "description": "Spicy leafy greens, rich in vitamin K",
+    "image": "vegetables/mustard-greens.jpg",
+    "scientific_name": "Brassica juncea"
+  },
+  {
+    "name": "Rutabaga",
+    "description": "Root vegetable cross between turnip and cabbage",
+    "image": "vegetables/rutabaga.jpg",
+    "scientific_name": "Brassica napus subsp. rapifera"
+  },
+  {
+    "name": "Jicama",
+    "description": "Crisp root vegetable with sweet, nutty flavor",
+    "image": "vegetables/jicama.jpg",
+    "scientific_name": "Pachyrhizus erosus"
+  },
+  {
+    "name": "Kohlrabi",
+    "description": "Bulbous stem vegetable with mild flavor",
+    "image": "vegetables/kohlrabi.jpg",
+    "scientific_name": "Brassica oleracea var. gongylodes"
+  },
+  {
+    "name": "Daikon",
+    "description": "Large white radish with mild flavor",
+    "image": "vegetables/daikon.jpg",
+    "scientific_name": "Raphanus sativus var. longipinnatus"
+  },
+  {
+    "name": "Taro",
+    "description": "Starchy root vegetable with hairy brown skin",
+    "image": "vegetables/taro.jpg",
+    "scientific_name": "Colocasia esculenta"
+  },
+  {
+    "name": "Yam",
+    "description": "Starchy tuber with rough brown skin",
+    "image": "vegetables/yam.jpg",
+    "scientific_name": "Dioscorea spp."
+  },
+  {
+    "name": "Cassava",
+    "description": "Starchy root vegetable, staple in tropical regions",
+    "image": "vegetables/cassava.jpg",
+    "scientific_name": "Manihot esculenta"
+  },
+  {
+    "name": "Plantain",
+    "description": "Starchy banana-like fruit used as vegetable",
+    "image": "vegetables/plantain.jpg",
+    "scientific_name": "Musa × paradisiaca"
+  },
+  {
+    "name": "Chayote",
+    "description": "Green squash with mild flavor and crisp texture",
+    "image": "vegetables/chayote.jpg",
+    "scientific_name": "Sechium edule"
+  },
+  {
+    "name": "Spaghetti Squash",
+    "description": "Winter squash with stringy flesh resembling spaghetti",
+    "image": "vegetables/spaghetti-squash.jpg",
+    "scientific_name": "Cucurbita pepo"
+  },
+  {
+    "name": "Acorn Squash",
+    "description": "Winter squash with ridged green skin and sweet flesh",
+    "image": "vegetables/acorn-squash.jpg",
+    "scientific_name": "Cucurbita pepo var. turbinata"
+  },
+  {
+    "name": "Delicata Squash",
+    "description": "Cylindrical winter squash with edible skin",
+    "image": "vegetables/delicata-squash.jpg",
+    "scientific_name": "Cucurbita pepo"
+  },
+  {
+    "name": "Pattypan Squash",
+    "description": "Small summer squash with scalloped edges",
+    "image": "vegetables/pattypan-squash.jpg",
+    "scientific_name": "Cucurbita pepo"
+  },
+  {
+    "name": "Hubbard Squash",
+    "description": "Large winter squash with bumpy skin",
+    "image": "vegetables/hubbard-squash.jpg",
+    "scientific_name": "Cucurbita maxima"
+  },
+  {
+    "name": "Kabocha Squash",
+    "description": "Japanese winter squash with sweet, dense flesh",
+    "image": "vegetables/kabocha-squash.jpg",
+    "scientific_name": "Cucurbita maxima"
+  },
+  {
+    "name": "Celeriac",
+    "description": "Root vegetable with celery-like flavor",
+    "image": "vegetables/celeriac.jpg",
+    "scientific_name": "Apium graveolens var. rapaceum"
+  },
+  {
+    "name": "Salsify",
+    "description": "Root vegetable with oyster-like flavor",
+    "image": "vegetables/salsify.jpg",
+    "scientific_name": "Tragopogon porrifolius"
+  },
+  {
+    "name": "Scorzonera",
+    "description": "Black-skinned root vegetable with white flesh",
+    "image": "vegetables/scorzonera.jpg",
+    "scientific_name": "Scorzonera hispanica"
+  },
+  {
+    "name": "Jerusalem Artichoke",
+    "description": "Tuber with nutty flavor, also called sunchoke",
+    "image": "vegetables/jerusalem-artichoke.jpg",
+    "scientific_name": "Helianthus tuberosus"
+  },
+  {
+    "name": "Bitter Melon",
+    "description": "Warty green fruit with bitter flavor",
+    "image": "vegetables/bitter-melon.jpg",
+    "scientific_name": "Momordica charantia"
+  },
+  {
+    "name": "Snake Gourd",
+    "description": "Long, curved gourd with striped skin",
+    "image": "vegetables/snake-gourd.jpg",
+    "scientific_name": "Trichosanthes cucumerina"
+  },
+  {
+    "name": "Ridge Gourd",
+    "description": "Ribbed green gourd with mild flavor",
+    "image": "vegetables/ridge-gourd.jpg",
+    "scientific_name": "Luffa acutangula"
+  },
+  {
+    "name": "Bottle Gourd",
+    "description": "Smooth-skinned gourd used in various cuisines",
+    "image": "vegetables/bottle-gourd.jpg",
+    "scientific_name": "Lagenaria siceraria"
+  },
+  {
+    "name": "Wax Gourd",
+    "description": "Large melon with waxy coating",
+    "image": "vegetables/wax-gourd.jpg",
+    "scientific_name": "Benincasa hispida"
+  },
+  {
+    "name": "Tinda",
+    "description": "Small round gourd popular in Indian cuisine",
+    "image": "vegetables/tinda.jpg",
+    "scientific_name": "Praecitrullus fistulosus"
+  },
+  {
+    "name": "Ivy Gourd",
+    "description": "Small green gourd with medicinal properties",
+    "image": "vegetables/ivy-gourd.jpg",
+    "scientific_name": "Coccinia grandis"
+  },
+  {
+    "name": "Drumstick",
+    "description": "Long green pods from moringa tree",
+    "image": "vegetables/drumstick.jpg",
+    "scientific_name": "Moringa oleifera"
+  },
+  {
+    "name": "Malabar Spinach",
+    "description": "Vining leafy green with thick, succulent leaves",
+    "image": "vegetables/malabar-spinach.jpg",
+    "scientific_name": "Basella alba"
+  }
+]
