@@ -1,10 +1,10 @@
 <template>
-  <div class="selector-page">
+  <div class="selector-page font-sr">
     <div class="selector-card">
-      <p class="selector-eyebrow">Organization Management</p>
-      <h1 class="selector-title">Choose A Version</h1>
-      <p class="selector-description">
-        Select which organization interface you want to open after login.
+      <p class="selector-eyebrow font-moul">ការគ្រប់គ្រងអង្គភាព</p>
+      <h1 class="selector-title font-moul">ជ្រើសរើសកំណែប្រើប្រាស់</h1>
+      <p class="selector-description font-sr">
+        ជ្រើសរើសទម្រង់អង្គភាពដែលអ្នកចង់បើកបន្ទាប់ពីចូលប្រព័ន្ធរួច។
       </p>
 
       <div class="selector-actions">
@@ -13,8 +13,8 @@
           class="selector-button"
           @click="router.push('/dashboard/organization-v1')"
         >
-          <span class="selector-button__label">Organization V1</span>
-          <span class="selector-button__text">Open the current organization management screen.</span>
+          <span class="selector-button__label font-moul">ការគ្រប់គ្រងអង្គភាព V1</span>
+          <span class="selector-button__text font-sr">បើកផ្ទាំងគ្រប់គ្រងអង្គភាពកំណែបច្ចុប្បន្ន។</span>
         </button>
 
         <button
@@ -22,8 +22,8 @@
           class="selector-button selector-button--alt"
           @click="router.push('/dashboard/organization-v1-1')"
         >
-          <span class="selector-button__label">Organization V1.1</span>
-          <span class="selector-button__text">Open the alternative organization management version.</span>
+          <span class="selector-button__label font-moul">ការគ្រប់គ្រងអង្គភាព V1.1</span>
+          <span class="selector-button__text font-sr">បើកផ្ទាំងគ្រប់គ្រងអង្គភាពកំណែថ្មី។</span>
         </button>
       </div>
     </div>
@@ -48,12 +48,12 @@ const router = useRouter()
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 28px;
 }
 
 .selector-card {
-  width: min(720px, 100%);
-  padding: 28px;
+  width: min(860px, 100%);
+  padding: 32px;
   background: #ffffff;
   border: 1px solid #dce4ee;
   border-radius: 24px;
@@ -86,14 +86,15 @@ const router = useRouter()
 .selector-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 24px;
+  gap: 18px;
+  margin-top: 28px;
 }
 
 .selector-button {
   display: grid;
-  gap: 8px;
-  padding: 20px;
+  gap: 10px;
+  min-height: 150px;
+  padding: 24px;
   text-align: left;
   background: linear-gradient(180deg, #eff4ff 0%, #e6eeff 100%);
   border: 1px solid #cfdcff;
@@ -114,14 +115,16 @@ const router = useRouter()
 
 .selector-button__label {
   color: #163153;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
+  line-height: 1.35;
 }
 
 .selector-button__text {
   color: #5f7289;
   font-size: 14px;
   line-height: 1.6;
+  max-width: 34ch;
 }
 
 @media (max-width: 720px) {
@@ -135,6 +138,11 @@ const router = useRouter()
 
   .selector-title {
     font-size: 26px;
+  }
+
+  .selector-button {
+    min-height: auto;
+    padding: 20px;
   }
 }
 </style>

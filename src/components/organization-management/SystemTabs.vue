@@ -13,7 +13,7 @@
         <HugeiconsIcon v-else-if="system.key === 'hr'" :icon="IdentificationIcon" class="tab-svg" :size="16" />
         <HugeiconsIcon v-else :icon="UserGroupIcon" class="tab-svg" :size="16" />
       </span>
-      <span>{{ system.name }}</span>
+      <span class="font-moul">{{ system.name }}</span>
     </button>
   </div>
 </template>
@@ -65,7 +65,7 @@ function updateSystem(value) {
   padding: 12px 20px;
   color: #526377;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 14px;
@@ -94,6 +94,21 @@ function updateSystem(value) {
 
 .tab-button.active .tab-icon {
   background: #eef3ff;
+}
+
+.tab-button:nth-child(1) .tab-icon {
+  color: #2563eb;
+  background: #e8f0ff;
+}
+
+.tab-button:nth-child(2) .tab-icon {
+  color: #0f9f72;
+  background: #e8faf3;
+}
+
+.tab-button:nth-child(3) .tab-icon {
+  color: #f08a1f;
+  background: #fff4e9;
 }
 
 .tab-svg {

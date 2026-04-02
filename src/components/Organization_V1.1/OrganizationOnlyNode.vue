@@ -36,7 +36,7 @@
         <span class="node-icon">
           <HugeiconsIcon :icon="Building02Icon" :size="16" />
         </span>
-        <span class="org-name">{{ node.name }}</span>
+        <span class="org-name font-sr">{{ node.name }}</span>
       </button>
     </div>
 
@@ -180,11 +180,12 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #2563eb;
+  color: #1d4ed8;
   background: linear-gradient(180deg, #eef5ff 0%, #dce9ff 100%);
   border: 1px solid #c9dbff;
   border-radius: 6px;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.14);
 }
 
 .org-name {

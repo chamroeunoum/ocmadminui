@@ -4,8 +4,8 @@
       <div class="section-title-row">
         <HugeiconsIcon :icon="Key01Icon" class="section-icon" :size="22" />
         <div>
-          <h3 class="card-title">Granular Permissions</h3>
-          <p class="section-note">Manage fine-grained access control across all modules.</p>
+          <h3 class="card-title font-moul">សិទ្ធិលម្អិត</h3>
+          <p class="section-note font-sr">គ្រប់គ្រងសិទ្ធិលម្អិតសម្រាប់មុខងារទាំងអស់ក្នុងប្រព័ន្ធ។</p>
         </div>
       </div>
 
@@ -15,7 +15,7 @@
           <input
             v-model.trim="searchQuery"
             type="text"
-            placeholder="Filter permissions..."
+            placeholder="ស្វែងរកសិទ្ធិ..."
           >
         </label>
 
@@ -25,88 +25,45 @@
       </div>
     </div>
 
-    <div v-if="groupedPermissions.length" class="permission-groups">
-      <section
-        v-for="group in groupedPermissions"
-        :key="group.name"
-        class="permission-group"
+    <div v-if="filteredPermissions.length" class="permission-card-grid">
+      <button
+        v-for="permission in filteredPermissions"
+        :key="permission.id"
+        type="button"
+        class="permission-card"
+        :class="{ selected: assignedPermissionIds.includes(permission.id) }"
+        @click="$emit('toggle-permission', permission.id)"
       >
-        <div class="permission-group__header">
-          <div class="permission-group__title">
-            <HugeiconsIcon :icon="ArrowDown01Icon" class="permission-group__arrow" :size="14" />
-            <h4>{{ group.name }}</h4>
-            <span class="permission-group__count">{{ getAssignedCount(group.items) }}/{{ group.items.length }}</span>
-          </div>
+        <div class="permission-card__head">
+          <span class="permission-check">
+            <HugeiconsIcon
+              :icon="assignedPermissionIds.includes(permission.id) ? CheckmarkSquare02Icon : SquareIcon"
+              :size="18"
+            />
+          </span>
 
-          <button
-            type="button"
-            class="permission-group__select-all"
-            @click="toggleGroup(group)"
-          >
-            {{ isGroupFullyAssigned(group.items) ? 'Clear All' : 'Select All' }}
-          </button>
+          <span
+            class="status-pill"
+            :class="{ active: assignedPermissionIds.includes(permission.id) }"
+            :aria-label="assignedPermissionIds.includes(permission.id) ? 'selected' : 'not selected'"
+          />
         </div>
 
-        <table class="permission-table">
-          <thead>
-            <tr>
-              <th>Permission</th>
-              <th>Description</th>
-              <th class="permission-table__status">Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr
-              v-for="permission in group.items"
-              :key="permission.id"
-              :class="{ selected: assignedPermissionIds.includes(permission.id) }"
-            >
-              <td>
-                <button
-                  type="button"
-                  class="permission-name"
-                  @click="$emit('toggle-permission', permission.id)"
-                >
-                  <span class="permission-check">
-                    <HugeiconsIcon
-                      :icon="assignedPermissionIds.includes(permission.id) ? CheckmarkSquare02Icon : SquareIcon"
-                      :size="18"
-                    />
-                  </span>
-                  <strong>{{ permission.name }}</strong>
-                </button>
-              </td>
-              <td>{{ permission.description }}</td>
-              <td class="permission-table__status">
-                <span
-                  class="status-pill"
-                  :class="{ active: assignedPermissionIds.includes(permission.id) }"
-                >
-                  {{ assignedPermissionIds.includes(permission.id) ? 'Enabled' : 'Disabled' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+        <div class="permission-card__body">
+          <strong class="font-moul">{{ permission.name }}</strong>
+          <p class="font-sr">{{ permission.description }}</p>
+        </div>
+      </button>
     </div>
 
-    <div v-else class="empty-state">
-      No permissions found for the current filter.
+    <div v-else class="empty-state font-sr">
+      មិនមានសិទ្ធិសមស្របនឹងពាក្យស្វែងរកនេះទេ។
     </div>
   </section>
 </template>
 
 <script setup>
-import {
-  ArrowDown01Icon,
-  CheckmarkSquare02Icon,
-  FilterHorizontalIcon,
-  Key01Icon,
-  Search02Icon,
-  SquareIcon
-} from '@hugeicons/core-free-icons'
+import { CheckmarkSquare02Icon, FilterHorizontalIcon, Key01Icon, Search02Icon, SquareIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { computed, ref } from 'vue'
 
@@ -125,12 +82,12 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['toggle-permission', 'set-permissions'])
+defineEmits(['toggle-permission', 'set-permissions'])
 const searchQuery = ref('')
 
-const groupedPermissions = computed(() => {
+const filteredPermissions = computed(() => {
   const query = searchQuery.value.toLowerCase()
-  const visiblePermissions = props.permissions.filter((permission) => {
+  return props.permissions.filter((permission) => {
     if (!query) {
       return true
     }
@@ -138,41 +95,10 @@ const groupedPermissions = computed(() => {
     return (
       permission.name.toLowerCase().includes(query) ||
       permission.description.toLowerCase().includes(query) ||
-      (permission.category || 'General').toLowerCase().includes(query)
+      (permission.category || '').toLowerCase().includes(query)
     )
   })
-
-  const groups = visiblePermissions.reduce((result, permission) => {
-    const groupName = permission.category || 'General'
-
-    if (!result[groupName]) {
-      result[groupName] = []
-    }
-
-    result[groupName].push(permission)
-    return result
-  }, {})
-
-  return Object.entries(groups).map(([name, items]) => ({
-    name,
-    items
-  }))
 })
-
-function getAssignedCount(items) {
-  return items.filter((item) => props.assignedPermissionIds.includes(item.id)).length
-}
-
-function isGroupFullyAssigned(items) {
-  return items.length > 0 && items.every((item) => props.assignedPermissionIds.includes(item.id))
-}
-
-function toggleGroup(group) {
-  emit('set-permissions', {
-    permissionIds: group.items.map((item) => item.id),
-    assign: !isGroupFullyAssigned(group.items)
-  })
-}
 </script>
 
 <style scoped>
@@ -183,7 +109,7 @@ function toggleGroup(group) {
 }
 
 .info-panel {
-  padding: 18px 18px 20px;
+  padding: 16px;
   background: #ffffff;
   border: 1px solid #dce4ee;
   border-radius: 20px;
@@ -195,7 +121,7 @@ function toggleGroup(group) {
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .section-title-row {
@@ -206,15 +132,19 @@ function toggleGroup(group) {
 
 .section-icon {
   color: #f08a1f;
+  background: #fff3e8;
+  border: 1px solid #ffd8b2;
+  border-radius: 10px;
+  padding: 5px;
 }
 
 .card-title {
   margin: 0 0 4px;
   color: #0f274a;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 .section-note {
@@ -266,110 +196,48 @@ function toggleGroup(group) {
   border-radius: 14px;
 }
 
-.permission-groups {
+.permission-card-grid {
   display: grid;
-  gap: 16px;
-}
-
-.permission-group {
-  border: 1px solid #dce4ee;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #ffffff;
-}
-
-.permission-group__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #edf1f6;
-}
-
-.permission-group__title {
-  display: flex;
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.permission-group__title h4 {
-  margin: 0;
-  color: #193355;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.permission-group__arrow {
-  color: #8093ac;
-}
-
-.permission-group__count {
-  color: #97a7bc;
-  font-size: 11px;
-  font-weight: 700;
-  background: #f3f6fb;
-  border-radius: 999px;
-  padding: 2px 8px;
-}
-
-.permission-group__select-all {
-  color: #2451ef;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.permission-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.permission-table th {
-  padding: 12px 18px;
-  color: #8a9bb1;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.permission-card {
+  display: grid;
+  gap: 10px;
+  padding: 13px;
   text-align: left;
-}
-
-.permission-table td {
-  padding: 16px 18px;
-  color: #5f7087;
-  font-size: 14px;
-  border-top: 1px solid #edf1f6;
-  vertical-align: middle;
-}
-
-.permission-table tr.selected {
-  background: #fbfdff;
-}
-
-.permission-table__status {
-  width: 150px;
-  text-align: right;
-}
-
-.permission-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: #193355;
-  font: inherit;
-  background: transparent;
-  border: none;
+  background: #ffffff;
+  border: 1px solid #e0e8f2;
+  border-radius: 14px;
   cursor: pointer;
 }
 
-.permission-name strong {
-  font-size: 14px;
-  font-weight: 700;
+.permission-card.selected {
+  background: #eef5ff;
+  border-color: #c7d9ff;
+}
+
+.permission-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.permission-card__body strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #193355;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.permission-card__body p {
+  margin: 0;
+  color: #64758a;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .permission-check {
@@ -380,28 +248,29 @@ function toggleGroup(group) {
 }
 
 .selected .permission-check {
-  color: #2451ef;
+  color: #16a34a;
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 86px;
-  padding: 6px 12px;
-  color: #9aa8ba;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: #f7f9fc;
-  border: 1px solid #edf1f6;
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  padding: 0;
+  color: transparent;
+  font-size: 0;
+  font-weight: 400;
+  background: #f3f5f8;
+  border: 1px solid #dfe5ed;
   border-radius: 999px;
 }
 
 .status-pill.active {
-  color: #14a36d;
-  background: #ecfbf4;
-  border-color: #cdeeda;
+  color: #16a34a;
+  background: #eafaf0;
+  border-color: #bfe7cd;
 }
 
 .empty-state {
@@ -425,6 +294,10 @@ function toggleGroup(group) {
   .search-box {
     min-width: 0;
     flex: 1;
+  }
+
+  .permission-card-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

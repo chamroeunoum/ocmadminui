@@ -1,18 +1,18 @@
 <template>
-  <div class="org-dashboard">
+  <div class="org-dashboard font-sr">
     <div class="dashboard-layout">
       <aside class="left-column">
         <section class="panel-card">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Structure</p>
-              <h2 class="panel-title">Organization Tree</h2>
-              <p class="section-description">
-                Select a position on the left to view holders, roles, and permissions.
+              <p class="eyebrow font-moul">រចនាសម្ព័ន្ធ</p>
+              <h2 class="panel-title font-moul">មែកធាងអង្គភាព</h2>
+              <p class="section-description font-sr">
+                ជ្រើសរើសតំណែងនៅខាងឆ្វេង ដើម្បីមើលអ្នកកាន់តំណែង តួនាទី និងសិទ្ធិប្រើប្រាស់។
               </p>
             </div>
 
-            <span class="panel-badge">{{ totalOrganizations }} orgs</span>
+            <span class="panel-badge font-sr">{{ totalOrganizations }} អង្គភាព</span>
           </div>
 
           <form class="tree-search" @submit.prevent="applyTreeSearch">
@@ -21,12 +21,12 @@
               <input
                 v-model.trim="treeSearchInput"
                 type="text"
-                placeholder="Search organization or position"
+                placeholder="ស្វែងរកអង្គភាព ឬតំណែង"
               >
             </label>
 
-            <button type="submit" class="tree-search-button">
-              Search
+            <button type="submit" class="tree-search-button font-moul">
+              ស្វែងរក
             </button>
           </form>
 
@@ -38,9 +38,9 @@
               @select-position="handlePositionSelect"
             />
 
-            <div v-else class="tree-empty-state">
-              <p>No organization found.</p>
-              <span>Try a different keyword for organization or position.</span>
+            <div v-else class="tree-empty-state font-sr">
+              <p class="font-moul">រកមិនឃើញអង្គភាពទេ។</p>
+              <span>សូមសាកល្បងពាក្យស្វែងរកផ្សេងសម្រាប់អង្គភាព ឬតំណែង។</span>
             </div>
           </div>
         </section>
@@ -49,14 +49,10 @@
       <section class="right-column">
         <section class="position-hero">
           <div class="position-hero-copy">
-            <h1 class="position-title">{{ selectedPosition.name }}</h1>
-            <p class="position-description">{{ selectedPosition.summary }}</p>
-            <p v-if="selectedHolder" class="active-officer">
-              Showing access for {{ selectedHolder.name }}
-            </p>
+            <h1 class="position-title font-moul">{{ selectedPosition.name }}</h1>
 
             <div class="holders-panel">
-              <p class="holders-label">Current Holders</p>
+              <p class="holders-label font-moul">អ្នកកាន់តំណែងបច្ចុប្បន្ន</p>
 
               <div class="holders-list holders-list--inline">
                 <article
@@ -69,11 +65,8 @@
                   <div class="holder-avatar">{{ holder.initials }}</div>
 
                   <div class="holder-copy">
-                    <strong>{{ holder.name }}</strong>
-                    <span>
-                      <HugeiconsIcon :icon="Mail01Icon" class="holder-email-icon" :size="12" />
-                      {{ holder.email }}
-                    </span>
+                    <strong class="font-sr">{{ holder.name }}</strong>
+                    <span class="holder-id font-sr">{{ holder.employeeId }}</span>
                   </div>
                 </article>
               </div>
@@ -109,7 +102,7 @@
 
 <script setup>
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { Mail01Icon, Search02Icon } from '@hugeicons/core-free-icons'
+import { Search02Icon } from '@hugeicons/core-free-icons'
 import { computed, ref } from 'vue'
 import OrganizationTree from '@/components/organization-management/OrganizationTree.vue'
 import PermissionList from '@/components/organization-management/PermissionList.vue'
@@ -124,16 +117,17 @@ import SystemTabs from '@/components/organization-management/SystemTabs.vue'
 const organizations = ref([
   {
     id: 1,
-    name: 'Global Corp',
+    name: 'ក្រុមហ៊ុនសកល',
     expanded: true,
     positions: [
       {
         id: 11,
-        name: 'CEO',
-        summary: 'Executive leadership and corporate direction',
+        name: 'អគ្គនាយក',
+        summary: 'ដឹកនាំយុទ្ធសាស្ត្រ និងទិសដៅសរុបរបស់ស្ថាប័ន',
         people: [
           {
             name: 'Sarah Jenkins',
+            employeeId: 'EMP-1001',
             email: 'sarah.jenkins@globalcorp.com',
             initials: 'SJ',
             systemAccess: {
@@ -153,11 +147,12 @@ const organizations = ref([
       },
       {
         id: 12,
-        name: 'COO',
-        summary: 'Operational strategy and delivery management',
+        name: 'នាយកប្រតិបត្តិការ',
+        summary: 'គ្រប់គ្រងយុទ្ធសាស្ត្រប្រតិបត្តិការ និងការអនុវត្តការងារ',
         people: [
           {
             name: 'Michael Chen',
+            employeeId: 'EMP-1002',
             email: 'michael.chen@globalcorp.com',
             initials: 'MC',
             systemAccess: {
@@ -179,16 +174,17 @@ const organizations = ref([
     children: [
       {
         id: 2,
-        name: 'North America Division',
+        name: 'ផ្នែកអាមេរិកខាងជើង',
         expanded: true,
         positions: [
           {
             id: 21,
-            name: 'Regional Director',
-            summary: 'Regional oversight and team performance',
+            name: 'នាយកតំបន់',
+            summary: 'ត្រួតពិនិត្យការងារតំបន់ និងលទ្ធផលក្រុម',
             people: [
               {
                 name: 'Elena Rodriguez',
+                employeeId: 'EMP-2001',
                 email: 'elena.rodriguez@globalcorp.com',
                 initials: 'ER',
                 systemAccess: {
@@ -208,11 +204,12 @@ const organizations = ref([
           },
           {
             id: 22,
-            name: 'HR Manager',
-            summary: 'People operations and workforce planning',
+            name: 'ប្រធានធនធានមនុស្ស',
+            summary: 'គ្រប់គ្រងបុគ្គលិក និងផែនការកម្លាំងការងារ',
             people: [
               {
                 name: 'David Smith',
+                employeeId: 'EMP-2002',
                 email: 'david.smith@globalcorp.com',
                 initials: 'DS',
                 systemAccess: {
@@ -234,16 +231,17 @@ const organizations = ref([
         children: [
           {
             id: 3,
-            name: 'Tech Hub - Austin',
+            name: 'មជ្ឈមណ្ឌលបច្ចេកវិទ្យា - Austin',
             expanded: true,
             positions: [
               {
                 id: 31,
-                name: 'Lead Architect',
-                summary: 'Platform design and technical governance',
+                name: 'ស្ថាបត្យករនាំមុខ',
+                summary: 'រចនាវេទិកា និងគ្រប់គ្រងស្តង់ដារបច្ចេកទេស',
                 people: [
                   {
                     name: 'Alex Rivera',
+                    employeeId: 'EMP-3001',
                     email: 'alex.rivera@globalcorp.com',
                     initials: 'AR',
                     systemAccess: {
@@ -263,11 +261,12 @@ const organizations = ref([
               },
               {
                 id: 32,
-                name: 'Senior Developer',
-                summary: 'Core product development',
+                name: 'អ្នកអភិវឌ្ឍន៍ជាន់ខ្ពស់',
+                summary: 'អភិវឌ្ឍប្រព័ន្ធស្នូល និងមុខងារសំខាន់ៗ',
                 people: [
                   {
                     name: 'Jamie Vough',
+                    employeeId: 'EMP-3002',
                     email: 'jamie.v@globalcorp.com',
                     initials: 'JV',
                     systemAccess: {
@@ -283,12 +282,121 @@ const organizations = ref([
                   },
                   {
                     name: 'Sam Taylor',
+                    employeeId: 'EMP-3003',
                     email: 'sam.t@globalcorp.com',
                     initials: 'ST',
                     systemAccess: {
                       erp: {
                         roleIds: [3],
                         permissionIds: [2, 3]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Nora Adams',
+                    employeeId: 'EMP-3004',
+                    email: 'nora.adams@globalcorp.com',
+                    initials: 'NA',
+                    systemAccess: {
+                      erp: {
+                        roleIds: [2],
+                        permissionIds: [1, 2]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Peter Long',
+                    employeeId: 'EMP-3005',
+                    email: 'peter.long@globalcorp.com',
+                    initials: 'PL',
+                    systemAccess: {
+                      erp: {
+                        roleIds: [3],
+                        permissionIds: [2]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Emily Ross',
+                    employeeId: 'EMP-3006',
+                    email: 'emily.ross@globalcorp.com',
+                    initials: 'ER',
+                    systemAccess: {
+                      hr: {
+                        roleIds: [6],
+                        permissionIds: [6]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Leo Martin',
+                    employeeId: 'EMP-3007',
+                    email: 'leo.martin@globalcorp.com',
+                    initials: 'LM',
+                    systemAccess: {
+                      crm: {
+                        roleIds: [8],
+                        permissionIds: [7, 8]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Chloe Turner',
+                    employeeId: 'EMP-3008',
+                    email: 'chloe.turner@globalcorp.com',
+                    initials: 'CT',
+                    systemAccess: {
+                      erp: {
+                        roleIds: [2],
+                        permissionIds: [1]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Ryan Cooper',
+                    employeeId: 'EMP-3009',
+                    email: 'ryan.cooper@globalcorp.com',
+                    initials: 'RC',
+                    systemAccess: {
+                      crm: {
+                        roleIds: [9],
+                        permissionIds: [9]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Mia Carter',
+                    employeeId: 'EMP-3010',
+                    email: 'mia.carter@globalcorp.com',
+                    initials: 'MC',
+                    systemAccess: {
+                      hr: {
+                        roleIds: [6],
+                        permissionIds: [5, 6]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Ethan Hall',
+                    employeeId: 'EMP-3011',
+                    email: 'ethan.hall@globalcorp.com',
+                    initials: 'EH',
+                    systemAccess: {
+                      erp: {
+                        roleIds: [3],
+                        permissionIds: [3]
+                      }
+                    }
+                  },
+                  {
+                    name: 'Sophia Green',
+                    employeeId: 'EMP-3012',
+                    email: 'sophia.green@globalcorp.com',
+                    initials: 'SG',
+                    systemAccess: {
+                      crm: {
+                        roleIds: [8],
+                        permissionIds: [7]
                       }
                     }
                   }
@@ -311,15 +419,16 @@ const organizations = ref([
       },
       {
         id: 4,
-        name: 'Europe Division',
+        name: 'ផ្នែកអឺរ៉ុប',
         positions: [
           {
             id: 41,
-            name: 'Finance Controller',
-            summary: 'Financial control and reporting oversight',
+            name: 'អ្នកត្រួតពិនិត្យហិរញ្ញវត្ថុ',
+            summary: 'ត្រួតពិនិត្យហិរញ្ញវត្ថុ និងរបាយការណ៍',
             people: [
               {
                 name: 'Laura Bennett',
+                employeeId: 'EMP-4001',
                 email: 'laura.bennett@globalcorp.com',
                 initials: 'LB',
                 systemAccess: {
@@ -331,6 +440,7 @@ const organizations = ref([
               },
               {
                 name: 'Oliver Grant',
+                employeeId: 'EMP-4002',
                 email: 'oliver.grant@globalcorp.com',
                 initials: 'OG',
                 systemAccess: {
@@ -353,15 +463,16 @@ const organizations = ref([
       },
       {
         id: 5,
-        name: 'Shared Services',
+        name: 'សេវារួម',
         positions: [
           {
             id: 51,
-            name: 'Operations Lead',
-            summary: 'Shared workflow execution and service delivery',
+            name: 'ប្រធានប្រតិបត្តិការ',
+            summary: 'គ្រប់គ្រងដំណើរការរួម និងការផ្តល់សេវា',
             people: [
               {
                 name: 'Hannah Brooks',
+                employeeId: 'EMP-5001',
                 email: 'hannah.brooks@globalcorp.com',
                 initials: 'HB',
                 systemAccess: {
@@ -373,6 +484,7 @@ const organizations = ref([
               },
               {
                 name: 'Noah Patel',
+                employeeId: 'EMP-5002',
                 email: 'noah.patel@globalcorp.com',
                 initials: 'NP',
                 systemAccess: {
@@ -392,11 +504,12 @@ const organizations = ref([
           },
           {
             id: 52,
-            name: 'Security Analyst',
-            summary: 'Security monitoring and incident support',
+            name: 'អ្នកវិភាគសន្តិសុខ',
+            summary: 'ត្រួតពិនិត្យសន្តិសុខ និងគាំទ្រហេតុការណ៍',
             people: [
               {
                 name: 'Marcus Lee',
+                employeeId: 'EMP-5003',
                 email: 'marcus.lee@globalcorp.com',
                 initials: 'ML',
                 systemAccess: {
@@ -424,124 +537,133 @@ const organizations = ref([
 const systems = ref([
   {
     key: 'erp',
-    name: 'ERP System',
+    name: 'ប្រព័ន្ធ ERP',
     roles: [
       {
         id: 1,
-        name: 'Finance Admin',
-        description: 'Full access to financial modules.'
+        name: 'អ្នកគ្រប់គ្រងហិរញ្ញវត្ថុ',
+        description: 'អាចប្រើម៉ូឌុលហិរញ្ញវត្ថុទាំងស្រុង។',
+        permissions: ['មើលបញ្ជីគណនី', 'កែប្រែការបញ្ជាទិញ']
       },
       {
         id: 2,
-        name: 'Inventory Clerk',
-        description: 'Manage stock levels and warehouse operations.'
+        name: 'បុគ្គលិកស្តុក',
+        description: 'គ្រប់គ្រងស្តុក និងប្រតិបត្តិការឃ្លាំង។',
+        permissions: ['មើលបញ្ជីគណនី', 'កែប្រែការបញ្ជាទិញ']
       },
       {
         id: 3,
-        name: 'Procurement Reviewer',
-        description: 'Review purchasing requests and supplier workflow steps.'
+        name: 'អ្នកត្រួតពិនិត្យការទិញ',
+        description: 'ពិនិត្យសំណើទិញ និងលំហូរការងារអ្នកផ្គត់ផ្គង់។',
+        permissions: ['កែប្រែការបញ្ជាទិញ', 'អនុម័តការទូទាត់']
       }
     ],
     permissions: [
       {
         id: 1,
-        name: 'View Ledger',
-        description: 'Ability to see general ledger entries.',
-        category: 'Finance'
+        name: 'មើលបញ្ជីគណនី',
+        description: 'អាចមើលទិន្នន័យក្នុងសៀវភៅគណនីទូទៅ។',
+        category: 'ហិរញ្ញវត្ថុ'
       },
       {
         id: 2,
-        name: 'Edit PO',
-        description: 'Create and modify purchase orders.',
-        category: 'Procurement'
+        name: 'កែប្រែការបញ្ជាទិញ',
+        description: 'បង្កើត និងកែប្រែពាក្យបញ្ជាទិញ។',
+        category: 'ការទិញ'
       },
       {
         id: 3,
-        name: 'Approve Payments',
-        description: 'Authorize outgoing bank transfers.',
-        category: 'Payments'
+        name: 'អនុម័តការទូទាត់',
+        description: 'អនុញ្ញាតការផ្ទេរប្រាក់ចេញ។',
+        category: 'ការទូទាត់'
       }
     ]
   },
   {
     key: 'hr',
-    name: 'HR Portal',
+    name: 'ប្រព័ន្ធធនធានមនុស្ស',
     roles: [
       {
         id: 4,
-        name: 'HR Administrator',
-        description: 'Maintains employee records, leave rules, and onboarding tasks.'
+        name: 'អ្នកគ្រប់គ្រងធនធានមនុស្ស',
+        description: 'គ្រប់គ្រងកំណត់ត្រាបុគ្គលិក ច្បាប់ឈប់សម្រាក និងការចូលបម្រើការងារ។',
+        permissions: ['អនុម័តការឈប់សម្រាក', 'កែប្រែប្រវត្តិបុគ្គលិក']
       },
       {
         id: 5,
-        name: 'Department Manager',
-        description: 'Reviews team requests, attendance, and performance notes.'
+        name: 'ប្រធានផ្នែក',
+        description: 'ពិនិត្យសំណើក្រុម វត្តមាន និងកំណត់ត្រាលទ្ធផលការងារ។',
+        permissions: ['អនុម័តការឈប់សម្រាក', 'មើលរបាយការណ៍វត្តមាន']
       },
       {
         id: 6,
-        name: 'Employee Self-Service User',
-        description: 'Updates profile details and submits routine HR requests.'
+        name: 'អ្នកប្រើសេវាខ្លួនឯង',
+        description: 'កែប្រែព័ត៌មានផ្ទាល់ខ្លួន និងដាក់សំណើធម្មតាទៅ HR។',
+        permissions: ['កែប្រែប្រវត្តិបុគ្គលិក', 'មើលរបាយការណ៍វត្តមាន']
       }
     ],
     permissions: [
       {
         id: 4,
-        name: 'Approve Leave Requests',
-        description: 'Lets managers review and approve time-off requests.',
-        category: 'Leave'
+        name: 'អនុម័តការឈប់សម្រាក',
+        description: 'អនុញ្ញាតឲ្យអ្នកគ្រប់គ្រងពិនិត្យ និងអនុម័តសំណើឈប់សម្រាក។',
+        category: 'ការឈប់សម្រាក'
       },
       {
         id: 5,
-        name: 'Edit Employee Profile',
-        description: 'Allows updates to staff contact details and profile information.',
-        category: 'Profile'
+        name: 'កែប្រែប្រវត្តិបុគ្គលិក',
+        description: 'អនុញ្ញាតឲ្យកែប្រែព័ត៌មានទំនាក់ទំនង និងប្រវត្តិបុគ្គលិក។',
+        category: 'ប្រវត្តិ'
       },
       {
         id: 6,
-        name: 'View Attendance Summary',
-        description: 'Shows employee attendance, lateness, and work schedule summaries.',
-        category: 'Attendance'
+        name: 'មើលរបាយការណ៍វត្តមាន',
+        description: 'បង្ហាញវត្តមាន ការយឺតយ៉ាវ និងកាលវិភាគការងារ។',
+        category: 'វត្តមាន'
       }
     ]
   },
   {
     key: 'crm',
-    name: 'CRM',
+    name: 'ប្រព័ន្ធ CRM',
     roles: [
       {
         id: 7,
-        name: 'CRM Manager',
-        description: 'Owns customer pipelines, team visibility, and process setup.'
+        name: 'អ្នកគ្រប់គ្រង CRM',
+        description: 'គ្រប់គ្រងលំហូរអតិថិជន ការមើលឃើញរបស់ក្រុម និងការកំណត់ដំណើរការ។',
+        permissions: ['បង្កើតអតិថិជនសក្តានុពល', 'មើលប្រវត្តិអតិថិជន']
       },
       {
         id: 8,
-        name: 'Sales Representative',
-        description: 'Tracks leads, updates contact notes, and manages opportunities.'
+        name: 'អ្នកលក់',
+        description: 'តាមដានអតិថិជនសក្តានុពល កែប្រែកំណត់ចំណាំ និងគ្រប់គ្រងឱកាសលក់។',
+        permissions: ['បង្កើតអតិថិជនសក្តានុពល', 'កែប្រែដំណាក់កាលឱកាស']
       },
       {
         id: 9,
-        name: 'Support Agent',
-        description: 'Follows customer requests and keeps issue records up to date.'
+        name: 'ភ្នាក់ងារគាំទ្រ',
+        description: 'តាមដានសំណើអតិថិជន និងធ្វើបច្ចុប្បន្នភាពកំណត់ត្រាបញ្ហា។',
+        permissions: ['មើលប្រវត្តិអតិថិជន']
       }
     ],
     permissions: [
       {
         id: 7,
-        name: 'Create Lead',
-        description: 'Create new lead records and assign them to team members.',
-        category: 'Leads'
+        name: 'បង្កើតអតិថិជនសក្តានុពល',
+        description: 'បង្កើតកំណត់ត្រាអតិថិជនសក្តានុពលថ្មី និងចែកជូនក្រុម។',
+        category: 'អតិថិជនសក្តានុពល'
       },
       {
         id: 8,
-        name: 'Update Opportunity Stage',
-        description: 'Move deals through the pipeline and keep sales progress accurate.',
-        category: 'Pipeline'
+        name: 'កែប្រែដំណាក់កាលឱកាស',
+        description: 'ធ្វើបច្ចុប្បន្នភាពដំណាក់កាលលក់ និងភាពរីកចម្រើន។',
+        category: 'លំហូរលក់'
       },
       {
         id: 9,
-        name: 'Read Customer Timeline',
-        description: 'Access interaction history, notes, and customer activity details.',
-        category: 'Customer Data'
+        name: 'មើលប្រវត្តិអតិថិជន',
+        description: 'អាចមើលប្រវត្តិទំនាក់ទំនង កំណត់ចំណាំ និងសកម្មភាពអតិថិជន។',
+        category: 'ទិន្នន័យអតិថិជន'
       }
     ]
   }
@@ -899,7 +1021,7 @@ function applyTreeSearch() {
 }
 
 .position-hero {
-  padding: 24px;
+  padding: 18px 20px;
   background: #ffffff;
   border: 1px solid #dce4ee;
   border-radius: 22px;
@@ -913,39 +1035,20 @@ function applyTreeSearch() {
 .position-title {
   margin: 0;
   color: #183153;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
   line-height: 1.1;
 }
 
-.position-description {
-  margin: 10px 0 0;
-  color: #5d7390;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.active-officer {
-  display: inline-flex;
-  align-items: center;
-  margin: 12px 0 0;
-  padding: 6px 10px;
-  color: #2753c7;
-  font-size: 12px;
-  font-weight: 700;
-  background: #edf3ff;
-  border-radius: 999px;
-}
-
 .holders-panel {
-  margin-top: 18px;
+  margin-top: 8px;
 }
 
 .holders-label {
   margin: 0 0 10px;
   color: #8a9bb2;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -957,8 +1060,8 @@ function applyTreeSearch() {
 
 .holders-list--inline {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  max-height: 220px;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   padding-right: 4px;
 }
 
@@ -1001,8 +1104,8 @@ function applyTreeSearch() {
 .holder-copy strong {
   display: block;
   color: #183153;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .holder-copy span {
@@ -1012,6 +1115,13 @@ function applyTreeSearch() {
   margin-top: 4px;
   color: #8ea3c0;
   font-size: 11px;
+}
+
+.holder-id {
+  display: block;
+  color: #54708f;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .holder-email-icon {

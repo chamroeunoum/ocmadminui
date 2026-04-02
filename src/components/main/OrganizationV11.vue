@@ -1,18 +1,18 @@
 <template>
-  <div class="org-dashboard">
+  <div class="org-dashboard font-sr">
     <div class="dashboard-layout">
       <aside class="left-column">
         <section class="panel-card">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Organization V1.1</p>
-              <h2 class="panel-title">Organizations</h2>
-              <p class="section-description">
-                Select an organization to manage positions, users, roles, and permissions.
+              <p class="eyebrow font-moul">អង្គភាព V1.1</p>
+              <h2 class="panel-title font-moul">បញ្ជីអង្គភាព</h2>
+              <p class="section-description font-sr">
+                ជ្រើសរើសអង្គភាពមួយ ដើម្បីគ្រប់គ្រងតំណែង អ្នកប្រើប្រាស់ តួនាទី និងសិទ្ធិប្រើប្រាស់។
               </p>
             </div>
 
-            <span class="panel-badge">{{ totalOrganizations }} orgs</span>
+            <span class="panel-badge font-sr">{{ totalOrganizations }} អង្គភាព</span>
           </div>
 
           <div class="tree-scroll">
@@ -27,16 +27,16 @@
 
       <section class="right-column">
         <section class="panel-card panel-card--hero">
-          <p class="eyebrow">Selected Organization</p>
-          <h1 class="position-title">{{ selectedOrganization.name }}</h1>
-          <p class="section-description">
-            Choose a position in this organization, then select a user to manage their access.
+          <p class="eyebrow font-moul">អង្គភាពដែលបានជ្រើស</p>
+          <h1 class="position-title font-moul">{{ selectedOrganization.name }}</h1>
+          <p class="section-description font-sr">
+            ជ្រើសរើសតំណែងក្នុងអង្គភាពនេះ បន្ទាប់មកជ្រើសអ្នកប្រើប្រាស់ ដើម្បីគ្រប់គ្រងសិទ្ធិប្រើប្រាស់។
           </p>
 
           <div class="positions-block">
             <div class="section-row">
-              <h3 class="section-title">Positions</h3>
-              <span class="panel-badge">{{ selectedOrganization.positions?.length || 0 }} total</span>
+              <h3 class="section-title font-moul">តំណែង</h3>
+              <span class="panel-badge font-sr">{{ selectedOrganization.positions?.length || 0 }} សរុប</span>
             </div>
 
             <div v-if="selectedOrganization.positions?.length" class="position-grid">
@@ -48,23 +48,23 @@
                 :class="{ 'position-card--active': position.id === selectedPosition.id }"
                 @click="handlePositionSelect(position)"
               >
-                <span class="position-card__name">{{ position.name }}</span>
-                <span class="position-card__meta">{{ position.people.length }} users</span>
+                <span class="position-card__name font-moul">{{ position.name }}</span>
+                <span class="position-card__meta font-sr">{{ position.people.length }} នាក់</span>
               </button>
             </div>
 
-            <div v-else class="empty-state">
-              This organization has no positions yet.
+            <div v-else class="empty-state font-sr">
+              អង្គភាពនេះមិនទាន់មានតំណែងនៅឡើយទេ។
             </div>
           </div>
 
           <div v-if="selectedPosition" class="users-block">
             <div class="section-row">
               <div>
-                <h3 class="section-title">{{ selectedPosition.name }}</h3>
-                <p class="section-caption">Users under this position</p>
+                <h3 class="section-title font-moul">{{ selectedPosition.name }}</h3>
+                <p class="section-caption font-sr">អ្នកប្រើប្រាស់នៅក្រោមតំណែងនេះ</p>
               </div>
-              <span class="panel-badge">{{ selectedPosition.people.length }} users</span>
+              <span class="panel-badge font-sr">{{ selectedPosition.people.length }} នាក់</span>
             </div>
 
             <div class="user-grid">
@@ -79,15 +79,11 @@
                 <div class="user-card__head">
                   <div class="holder-avatar">{{ user.initials }}</div>
                   <div class="user-copy">
-                    <strong>{{ user.name }}</strong>
-                    <span>{{ user.employeeId }}</span>
+                    <strong class="font-sr">{{ user.name }}</strong>
+                    <span class="font-sr">{{ user.employeeId }}</span>
                   </div>
                 </div>
 
-                <p class="user-email">
-                  <HugeiconsIcon :icon="Mail01Icon" :size="12" />
-                  {{ user.email }}
-                </p>
               </button>
             </div>
           </div>
@@ -120,8 +116,6 @@
 </template>
 
 <script setup>
-import { Mail01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/vue'
 import { computed, ref } from 'vue'
 import OrganizationOnlyTree from '@/components/Organization_V1.1/OrganizationOnlyTree.vue'
 import PermissionList from '@/components/Organization_V1.1/PermissionList.vue'
@@ -131,12 +125,12 @@ import SystemTabs from '@/components/Organization_V1.1/SystemTabs.vue'
 const organizations = ref([
   {
     id: 1,
-    name: 'Global Corp',
+    name: 'ក្រុមហ៊ុនសកល',
     expanded: true,
     positions: [
       {
         id: 11,
-        name: 'CEO',
+        name: 'អគ្គនាយក',
         people: [
           {
             name: 'Sarah Jenkins',
@@ -151,7 +145,7 @@ const organizations = ref([
       },
       {
         id: 12,
-        name: 'COO',
+        name: 'នាយកប្រតិបត្តិការ',
         people: [
           {
             name: 'Michael Chen',
@@ -163,17 +157,93 @@ const organizations = ref([
             }
           }
         ]
+      },
+      {
+        id: 13,
+        name: 'ប្រធានហិរញ្ញវត្ថុ',
+        people: [
+          {
+            name: 'Lina Sok',
+            employeeId: 'EMP-1003',
+            email: 'lina.sok@globalcorp.com',
+            initials: 'LS',
+            systemAccess: {
+              erp: { roleIds: [1, 3], permissionIds: [1, 2, 3] }
+            }
+          }
+        ]
+      },
+      {
+        id: 14,
+        name: 'ប្រធានព័ត៌មានវិទ្យា',
+        people: [
+          {
+            name: 'Dara Lim',
+            employeeId: 'EMP-1004',
+            email: 'dara.lim@globalcorp.com',
+            initials: 'DL',
+            systemAccess: {
+              erp: { roleIds: [2], permissionIds: [1, 2] },
+              crm: { roleIds: [7], permissionIds: [7, 9] }
+            }
+          }
+        ]
+      },
+      {
+        id: 15,
+        name: 'ប្រធានអនុលោមភាព',
+        people: [
+          {
+            name: 'Malis Chan',
+            employeeId: 'EMP-1005',
+            email: 'malis.chan@globalcorp.com',
+            initials: 'MC',
+            systemAccess: {
+              erp: { roleIds: [3], permissionIds: [1, 3] }
+            }
+          }
+        ]
+      },
+      {
+        id: 16,
+        name: 'ប្រធានរដ្ឋបាល',
+        people: [
+          {
+            name: 'Vannak Phan',
+            employeeId: 'EMP-1006',
+            email: 'vannak.phan@globalcorp.com',
+            initials: 'VP',
+            systemAccess: {
+              hr: { roleIds: [5], permissionIds: [4, 5] }
+            }
+          }
+        ]
+      },
+      {
+        id: 17,
+        name: 'ប្រធានយុទ្ធសាស្ត្រ',
+        people: [
+          {
+            name: 'Sophea Kim',
+            employeeId: 'EMP-1007',
+            email: 'sophea.kim@globalcorp.com',
+            initials: 'SK',
+            systemAccess: {
+              crm: { roleIds: [7], permissionIds: [7, 8, 9] }
+            }
+          }
+        ]
       }
     ],
     children: [
       {
         id: 2,
-        name: 'North America Division',
+        name: 'ផ្នែកអាមេរិកខាងជើង',
         expanded: true,
         positions: [
           {
             id: 21,
-            name: 'Regional Director',
+            name: 'នាយកតំបន់',
             people: [
               {
                 name: 'Elena Rodriguez',
@@ -188,7 +258,7 @@ const organizations = ref([
           },
           {
             id: 22,
-            name: 'HR Manager',
+            name: 'ប្រធានធនធានមនុស្ស',
             people: [
               {
                 name: 'David Smith',
@@ -205,12 +275,12 @@ const organizations = ref([
         children: [
           {
             id: 3,
-            name: 'Tech Hub - Austin',
+            name: 'មជ្ឈមណ្ឌលបច្ចេកវិទ្យា - Austin',
             expanded: true,
             positions: [
               {
                 id: 31,
-                name: 'Lead Architect',
+                name: 'ស្ថាបត្យករនាំមុខ',
                 people: [
                   {
                     name: 'Alex Rivera',
@@ -225,7 +295,7 @@ const organizations = ref([
               },
               {
                 id: 32,
-                name: 'Senior Developer',
+                name: 'អ្នកអភិវឌ្ឍន៍ជាន់ខ្ពស់',
                 people: [
                   {
                     name: 'Jamie Vough',
@@ -245,6 +315,87 @@ const organizations = ref([
                     systemAccess: {
                       erp: { roleIds: [3], permissionIds: [2, 3] }
                     }
+                  },
+                  {
+                    name: 'Nora Adams',
+                    employeeId: 'EMP-3004',
+                    email: 'nora.adams@globalcorp.com',
+                    initials: 'NA',
+                    systemAccess: {
+                      erp: { roleIds: [2], permissionIds: [1, 2] }
+                    }
+                  },
+                  {
+                    name: 'Peter Long',
+                    employeeId: 'EMP-3005',
+                    email: 'peter.long@globalcorp.com',
+                    initials: 'PL',
+                    systemAccess: {
+                      erp: { roleIds: [3], permissionIds: [2] }
+                    }
+                  },
+                  {
+                    name: 'Emily Ross',
+                    employeeId: 'EMP-3006',
+                    email: 'emily.ross@globalcorp.com',
+                    initials: 'ER',
+                    systemAccess: {
+                      hr: { roleIds: [6], permissionIds: [6] }
+                    }
+                  },
+                  {
+                    name: 'Leo Martin',
+                    employeeId: 'EMP-3007',
+                    email: 'leo.martin@globalcorp.com',
+                    initials: 'LM',
+                    systemAccess: {
+                      crm: { roleIds: [8], permissionIds: [7, 8] }
+                    }
+                  },
+                  {
+                    name: 'Chloe Turner',
+                    employeeId: 'EMP-3008',
+                    email: 'chloe.turner@globalcorp.com',
+                    initials: 'CT',
+                    systemAccess: {
+                      erp: { roleIds: [2], permissionIds: [1] }
+                    }
+                  },
+                  {
+                    name: 'Ryan Cooper',
+                    employeeId: 'EMP-3009',
+                    email: 'ryan.cooper@globalcorp.com',
+                    initials: 'RC',
+                    systemAccess: {
+                      crm: { roleIds: [9], permissionIds: [9] }
+                    }
+                  },
+                  {
+                    name: 'Mia Carter',
+                    employeeId: 'EMP-3010',
+                    email: 'mia.carter@globalcorp.com',
+                    initials: 'MC',
+                    systemAccess: {
+                      hr: { roleIds: [6], permissionIds: [5, 6] }
+                    }
+                  },
+                  {
+                    name: 'Ethan Hall',
+                    employeeId: 'EMP-3011',
+                    email: 'ethan.hall@globalcorp.com',
+                    initials: 'EH',
+                    systemAccess: {
+                      erp: { roleIds: [3], permissionIds: [3] }
+                    }
+                  },
+                  {
+                    name: 'Sophia Green',
+                    employeeId: 'EMP-3012',
+                    email: 'sophia.green@globalcorp.com',
+                    initials: 'SG',
+                    systemAccess: {
+                      crm: { roleIds: [8], permissionIds: [7] }
+                    }
                   }
                 ]
               }
@@ -255,11 +406,11 @@ const organizations = ref([
       },
       {
         id: 4,
-        name: 'Europe Division',
+        name: 'ផ្នែកអឺរ៉ុប',
         positions: [
           {
             id: 41,
-            name: 'Finance Controller',
+            name: 'អ្នកត្រួតពិនិត្យហិរញ្ញវត្ថុ',
             people: [
               {
                 name: 'Laura Bennett',
@@ -286,11 +437,11 @@ const organizations = ref([
       },
       {
         id: 5,
-        name: 'Shared Services',
+        name: 'សេវារួម',
         positions: [
           {
             id: 51,
-            name: 'Operations Lead',
+            name: 'ប្រធានប្រតិបត្តិការ',
             people: [
               {
                 name: 'Hannah Brooks',
@@ -314,7 +465,7 @@ const organizations = ref([
           },
           {
             id: 52,
-            name: 'Security Analyst',
+            name: 'អ្នកវិភាគសន្តិសុខ',
             people: [
               {
                 name: 'Marcus Lee',
@@ -337,44 +488,44 @@ const organizations = ref([
 const systems = ref([
   {
     key: 'erp',
-    name: 'ERP System',
+    name: 'ប្រព័ន្ធ ERP',
     roles: [
-      { id: 1, name: 'Finance Admin', description: 'Full access to financial modules.' },
-      { id: 2, name: 'Inventory Clerk', description: 'Manage stock levels and warehouse operations.' },
-      { id: 3, name: 'Procurement Reviewer', description: 'Review purchasing requests and supplier workflow steps.' }
+      { id: 1, name: 'អ្នកគ្រប់គ្រងហិរញ្ញវត្ថុ', description: 'អាចប្រើម៉ូឌុលហិរញ្ញវត្ថុទាំងស្រុង។', permissions: ['មើលបញ្ជីគណនី', 'កែប្រែការបញ្ជាទិញ'] },
+      { id: 2, name: 'បុគ្គលិកស្តុក', description: 'គ្រប់គ្រងស្តុក និងប្រតិបត្តិការឃ្លាំង។', permissions: ['មើលបញ្ជីគណនី', 'កែប្រែការបញ្ជាទិញ'] },
+      { id: 3, name: 'អ្នកត្រួតពិនិត្យការទិញ', description: 'ពិនិត្យសំណើទិញ និងលំហូរការងារអ្នកផ្គត់ផ្គង់។', permissions: ['កែប្រែការបញ្ជាទិញ', 'អនុម័តការទូទាត់'] }
     ],
     permissions: [
-      { id: 1, name: 'View Ledger', description: 'Ability to see general ledger entries.', category: 'Finance' },
-      { id: 2, name: 'Edit PO', description: 'Create and modify purchase orders.', category: 'Procurement' },
-      { id: 3, name: 'Approve Payments', description: 'Authorize outgoing bank transfers.', category: 'Payments' }
+      { id: 1, name: 'មើលបញ្ជីគណនី', description: 'អាចមើលទិន្នន័យក្នុងសៀវភៅគណនីទូទៅ។', category: 'ហិរញ្ញវត្ថុ' },
+      { id: 2, name: 'កែប្រែការបញ្ជាទិញ', description: 'បង្កើត និងកែប្រែពាក្យបញ្ជាទិញ។', category: 'ការទិញ' },
+      { id: 3, name: 'អនុម័តការទូទាត់', description: 'អនុញ្ញាតការផ្ទេរប្រាក់ចេញ។', category: 'ការទូទាត់' }
     ]
   },
   {
     key: 'hr',
-    name: 'HR Portal',
+    name: 'ប្រព័ន្ធធនធានមនុស្ស',
     roles: [
-      { id: 4, name: 'HR Administrator', description: 'Maintains employee records, leave rules, and onboarding tasks.' },
-      { id: 5, name: 'Department Manager', description: 'Reviews team requests, attendance, and performance notes.' },
-      { id: 6, name: 'Employee Self-Service User', description: 'Updates profile details and submits routine HR requests.' }
+      { id: 4, name: 'អ្នកគ្រប់គ្រងធនធានមនុស្ស', description: 'គ្រប់គ្រងកំណត់ត្រាបុគ្គលិក ច្បាប់ឈប់សម្រាក និងការចូលបម្រើការងារ។', permissions: ['អនុម័តការឈប់សម្រាក', 'កែប្រែប្រវត្តិបុគ្គលិក'] },
+      { id: 5, name: 'ប្រធានផ្នែក', description: 'ពិនិត្យសំណើក្រុម វត្តមាន និងកំណត់ត្រាលទ្ធផលការងារ។', permissions: ['អនុម័តការឈប់សម្រាក', 'មើលរបាយការណ៍វត្តមាន'] },
+      { id: 6, name: 'អ្នកប្រើសេវាខ្លួនឯង', description: 'កែប្រែព័ត៌មានផ្ទាល់ខ្លួន និងដាក់សំណើធម្មតាទៅ HR។', permissions: ['កែប្រែប្រវត្តិបុគ្គលិក', 'មើលរបាយការណ៍វត្តមាន'] }
     ],
     permissions: [
-      { id: 4, name: 'Approve Leave Requests', description: 'Lets managers review and approve time-off requests.', category: 'Leave' },
-      { id: 5, name: 'Edit Employee Profile', description: 'Allows updates to staff contact details and profile information.', category: 'Profile' },
-      { id: 6, name: 'View Attendance Summary', description: 'Shows employee attendance, lateness, and work schedule summaries.', category: 'Attendance' }
+      { id: 4, name: 'អនុម័តការឈប់សម្រាក', description: 'អនុញ្ញាតឲ្យអ្នកគ្រប់គ្រងពិនិត្យ និងអនុម័តសំណើឈប់សម្រាក។', category: 'ការឈប់សម្រាក' },
+      { id: 5, name: 'កែប្រែប្រវត្តិបុគ្គលិក', description: 'អនុញ្ញាតឲ្យកែប្រែព័ត៌មានទំនាក់ទំនង និងប្រវត្តិបុគ្គលិក។', category: 'ប្រវត្តិ' },
+      { id: 6, name: 'មើលរបាយការណ៍វត្តមាន', description: 'បង្ហាញវត្តមាន ការយឺតយ៉ាវ និងកាលវិភាគការងារ។', category: 'វត្តមាន' }
     ]
   },
   {
     key: 'crm',
-    name: 'CRM',
+    name: 'ប្រព័ន្ធ CRM',
     roles: [
-      { id: 7, name: 'CRM Manager', description: 'Owns customer pipelines, team visibility, and process setup.' },
-      { id: 8, name: 'Sales Representative', description: 'Tracks leads, updates contact notes, and manages opportunities.' },
-      { id: 9, name: 'Support Agent', description: 'Follows customer requests and keeps issue records up to date.' }
+      { id: 7, name: 'អ្នកគ្រប់គ្រង CRM', description: 'គ្រប់គ្រងលំហូរអតិថិជន ការមើលឃើញរបស់ក្រុម និងការកំណត់ដំណើរការ។', permissions: ['បង្កើតអតិថិជនសក្តានុពល', 'មើលប្រវត្តិអតិថិជន'] },
+      { id: 8, name: 'អ្នកលក់', description: 'តាមដានអតិថិជនសក្តានុពល កែប្រែកំណត់ចំណាំ និងគ្រប់គ្រងឱកាសលក់។', permissions: ['បង្កើតអតិថិជនសក្តានុពល', 'កែប្រែដំណាក់កាលឱកាស'] },
+      { id: 9, name: 'ភ្នាក់ងារគាំទ្រ', description: 'តាមដានសំណើអតិថិជន និងធ្វើបច្ចុប្បន្នភាពកំណត់ត្រាបញ្ហា។', permissions: ['មើលប្រវត្តិអតិថិជន'] }
     ],
     permissions: [
-      { id: 7, name: 'Create Lead', description: 'Create new lead records and assign them to team members.', category: 'Leads' },
-      { id: 8, name: 'Update Opportunity Stage', description: 'Move deals through the pipeline and keep sales progress accurate.', category: 'Pipeline' },
-      { id: 9, name: 'Read Customer Timeline', description: 'Access interaction history, notes, and customer activity details.', category: 'Customer Data' }
+      { id: 7, name: 'បង្កើតអតិថិជនសក្តានុពល', description: 'បង្កើតកំណត់ត្រាអតិថិជនសក្តានុពលថ្មី និងចែកជូនក្រុម។', category: 'អតិថិជនសក្តានុពល' },
+      { id: 8, name: 'កែប្រែដំណាក់កាលឱកាស', description: 'ធ្វើបច្ចុប្បន្នភាពដំណាក់កាលលក់ និងភាពរីកចម្រើន។', category: 'លំហូរលក់' },
+      { id: 9, name: 'មើលប្រវត្តិអតិថិជន', description: 'អាចមើលប្រវត្តិទំនាក់ទំនង កំណត់ចំណាំ និងសកម្មភាពអតិថិជន។', category: 'ទិន្នន័យអតិថិជន' }
     ]
   }
 ])
@@ -543,7 +694,7 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 }
 
 .panel-card--hero {
-  padding-bottom: 24px;
+  padding: 18px 20px;
 }
 
 .panel-header {
@@ -574,8 +725,8 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 }
 
 .position-title {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .section-description {
@@ -603,7 +754,7 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 
 .positions-block,
 .users-block {
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
 .section-row {
@@ -617,8 +768,8 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 .section-title {
   margin: 0;
   color: #163153;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .section-caption {
@@ -628,15 +779,17 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 }
 
 .position-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
 .position-card {
   display: grid;
   gap: 6px;
-  padding: 16px;
+  width: auto;
+  min-width: 180px;
+  padding: 14px 16px;
   text-align: left;
   background: #ffffff;
   border: 1px solid #dce4ee;
@@ -652,13 +805,13 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 
 .position-card__name {
   color: #163153;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .position-card__meta {
   color: #7a8ca4;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .user-grid {
@@ -670,7 +823,7 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 .user-card {
   display: grid;
   gap: 10px;
-  padding: 16px;
+  padding: 14px;
   text-align: left;
   background: #ffffff;
   border: 1px solid #dce4ee;
@@ -707,8 +860,8 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
 .user-copy strong {
   display: block;
   color: #163153;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .user-copy span {
@@ -716,16 +869,7 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
   margin-top: 4px;
   color: #7a8ca4;
   font-size: 12px;
-  font-weight: 700;
-}
-
-.user-email {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: #7a8ca4;
-  font-size: 12px;
+  font-weight: 400;
 }
 
 .empty-state {

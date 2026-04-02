@@ -28,12 +28,12 @@
             <span class="node-icon">
               <HugeiconsIcon :icon="Building02Icon" class="node-svg" :size="16" />
             </span>
-            <h3>{{ node.name }}</h3>
+            <h3 class="font-sr">{{ node.name }}</h3>
           </div>
 
           <div v-if="hasChildren" class="org-meta">
             <span class="meta-count">{{ childCount }}</span>
-            <span class="meta-label">{{ childCount === 1 ? '1 sub-org' : `${childCount} sub-orgs` }}</span>
+            <span class="meta-label font-sr">{{ childCount === 1 ? '1 អង្គភាពរង' : `${childCount} អង្គភាពរង` }}</span>
           </div>
         </div>
 
@@ -51,7 +51,7 @@
               <span class="position-icon">
                 <HugeiconsIcon :icon="UserCircleIcon" class="position-svg" :size="15" />
               </span>
-              <strong>{{ position.name }}</strong>
+              <strong class="font-sr">{{ position.name }}</strong>
             </button>
           </div>
         </div>
@@ -262,11 +262,12 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #2563eb;
+  color: #1d4ed8;
   background: linear-gradient(180deg, #eef5ff 0%, #dce9ff 100%);
   border: 1px solid #c9dbff;
   border-radius: 6px;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.14);
 }
 
 .node-svg {
@@ -331,6 +332,7 @@ watch(
   background: linear-gradient(180deg, #effdf7 0%, #daf7ea 100%);
   border: 1px solid #c6efd9;
   border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(15, 159, 114, 0.14);
 }
 
 .position-svg {

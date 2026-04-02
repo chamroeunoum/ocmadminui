@@ -33,7 +33,7 @@
 
           <div v-if="hasChildren" class="org-meta">
             <span class="meta-count">{{ childCount }}</span>
-            <span class="meta-label">{{ childCount === 1 ? '1 sub-org' : `${childCount} sub-orgs` }}</span>
+            <span class="meta-label font-sr">{{ childCount === 1 ? '1 អង្គភាពរង' : `${childCount} អង្គភាពរង` }}</span>
           </div>
         </div>
 
