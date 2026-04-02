@@ -3,6 +3,8 @@ import LoginComponent from './../layouts/login/Index.vue'
 // import LoginComponent from './../layouts/login/DeepSeek.vue'
 import DashboardComponent from '../components/main/Index.vue'
 import DashboardWidget from '../components/main/Dashboard.vue'
+import DashboardSelector from '../components/main/DashboardSelector.vue'
+import OrganizationV11 from '../components/main/OrganizationV11.vue'
 
 /**
  * Error
@@ -46,9 +48,27 @@ export const getRoutes = () => {
             },
             children: [
                 {
-                    name: 'DashboardWidgets' ,
+                    name: 'DashboardSelector' ,
                     path: '',
+                    component: DashboardSelector ,
+                    meta : {
+                        transition: 'slide-left' ,
+                        requiresAuth: true
+                    }
+                },
+                {
+                    name: 'DashboardWidgets' ,
+                    path: 'organization-v1',
                     component: DashboardWidget ,
+                    meta : {
+                        transition: 'slide-left' ,
+                        requiresAuth: true
+                    }
+                },
+                {
+                    name: 'DashboardWidgetsV11' ,
+                    path: 'organization-v1-1',
+                    component: OrganizationV11 ,
                     meta : {
                         transition: 'slide-left' ,
                         requiresAuth: true
