@@ -7,6 +7,20 @@
             <div>
               <p class="eyebrow font-moul">រចនាសម្ព័ន្ធ</p>
               <h2 class="panel-title font-moul">មែកធាងអង្គភាព</h2>
+              <form class="tree-search" @submit.prevent="applyTreeSearch">
+                <label class="tree-search-field">
+                  <HugeiconsIcon :icon="Search02Icon" class="tree-search-icon" :size="18" />
+                  <input
+                    v-model.trim="treeSearchInput"
+                    type="text"
+                    placeholder="ស្វែងរកអង្គភាព ឬតំណែង"
+                  >
+                </label>
+
+                <button type="submit" class="tree-search-button font-moul">
+                  ស្វែងរក
+                </button>
+              </form>
               <p class="section-description font-sr">
                 ជ្រើសរើសតំណែងនៅខាងឆ្វេង ដើម្បីមើលអ្នកកាន់តំណែង តួនាទី និងសិទ្ធិប្រើប្រាស់។
               </p>
@@ -15,27 +29,13 @@
             <span class="panel-badge font-sr">{{ totalOrganizations }} អង្គភាព</span>
           </div>
 
-          <form class="tree-search" @submit.prevent="applyTreeSearch">
-            <label class="tree-search-field">
-              <HugeiconsIcon :icon="Search02Icon" class="tree-search-icon" :size="18" />
-              <input
-                v-model.trim="treeSearchInput"
-                type="text"
-                placeholder="ស្វែងរកអង្គភាព ឬតំណែង"
-              >
-            </label>
-
-            <button type="submit" class="tree-search-button font-moul">
-              ស្វែងរក
-            </button>
-          </form>
-
           <div class="tree-scroll">
             <OrganizationTree
               v-if="filteredOrganizations.length"
               :organizations="filteredOrganizations"
               :selected-position-id="selectedPosition.id"
               @select-position="handlePositionSelect"
+              @node-action="handleNodeAction"
             />
 
             <div v-else class="tree-empty-state font-sr">
@@ -96,6 +96,27 @@
           />
         </div>
       </section>
+    </div>
+
+    <div v-if="isNodeModalOpen" class="overlay-backdrop" @click="closeNodeModal">
+      <div class="overlay-card" @click.stop>
+        <h3 class="overlay-title font-moul">{{ modalTitle }}</h3>
+        <p class="overlay-text font-sr">{{ modalDescription }}</p>
+
+        <label v-if="nodeModalAction !== 'delete'" class="overlay-field">
+          <span class="font-sr">{{ nodeModalAction === 'add-position' ? 'ឈ្មោះតួនាទី' : 'ឈ្មោះអង្គភាព' }}</span>
+          <input v-model.trim="nodeModalName" type="text">
+        </label>
+
+        <div class="overlay-actions">
+          <button type="button" class="overlay-button overlay-button--ghost font-sr" @click="closeNodeModal">
+            បិទ
+          </button>
+          <button type="button" class="overlay-button font-sr" @click="submitNodeAction">
+            រក្សាទុក
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -674,6 +695,10 @@ const selectedPositionId = ref(32)
 const selectedHolderEmail = ref('jamie.v@globalcorp.com')
 const treeSearchInput = ref('')
 const treeSearchKeyword = ref('')
+const isNodeModalOpen = ref(false)
+const nodeModalAction = ref('')
+const nodeModalTargetId = ref(null)
+const nodeModalName = ref('')
 
 const currentSystem = computed(() => {
   return systems.value.find((system) => system.key === activeSystem.value) || systems.value[0]
@@ -741,6 +766,26 @@ const totalOrganizations = computed(() => {
   }
 
   return countItems(organizations.value)
+})
+
+const modalTitle = computed(() => {
+  if (nodeModalAction.value === 'add-position') {
+    return 'បន្ថែមតួនាទី'
+  }
+
+  if (nodeModalAction.value === 'add-organization') {
+    return 'បន្ថែមអង្គភាព'
+  }
+
+  return 'លុបអង្គភាព'
+})
+
+const modalDescription = computed(() => {
+  if (nodeModalAction.value === 'delete') {
+    return 'តើអ្នកចង់លុបអង្គភាពនេះមែនទេ?'
+  }
+
+  return 'សូមបំពេញព័ត៌មានខាងក្រោម។'
 })
 
 function handlePositionSelect(position) {
@@ -817,6 +862,94 @@ function setPermissionsForSelectedHolder({ permissionIds, assign }) {
 
 function applyTreeSearch() {
   treeSearchKeyword.value = treeSearchInput.value
+}
+
+function findOrganizationById(items, id) {
+  for (const item of items) {
+    if (item.id === id) {
+      return item
+    }
+
+    const match = findOrganizationById(item.children || [], id)
+    if (match) {
+      return match
+    }
+  }
+
+  return null
+}
+
+function removeOrganizationById(items, id) {
+  return items
+    .filter((item) => item.id !== id)
+    .map((item) => ({
+      ...item,
+      children: removeOrganizationById(item.children || [], id)
+    }))
+}
+
+function ensureDashboardSelection() {
+  const positions = getAllPositions(organizations.value)
+  const currentPosition = positions.find((position) => position.id === selectedPositionId.value)
+  const fallbackPosition = currentPosition || positions[0] || null
+
+  selectedPositionId.value = fallbackPosition?.id || null
+  selectedHolderEmail.value = fallbackPosition?.people?.[0]?.email || ''
+}
+
+function handleNodeAction({ action, node }) {
+  nodeModalAction.value = action
+  nodeModalTargetId.value = node.id
+  nodeModalName.value = ''
+  isNodeModalOpen.value = true
+}
+
+function closeNodeModal() {
+  isNodeModalOpen.value = false
+  nodeModalAction.value = ''
+  nodeModalTargetId.value = null
+  nodeModalName.value = ''
+}
+
+function submitNodeAction() {
+  const target = findOrganizationById(organizations.value, nodeModalTargetId.value)
+
+  if (!target) {
+    closeNodeModal()
+    return
+  }
+
+  if (nodeModalAction.value === 'add-position' && nodeModalName.value) {
+    const newPosition = {
+      id: Date.now(),
+      name: nodeModalName.value,
+      summary: 'តួនាទីថ្មីក្នុងអង្គភាពនេះ',
+      people: []
+    }
+
+    target.positions = [...(target.positions || []), newPosition]
+    selectedPositionId.value = newPosition.id
+    selectedHolderEmail.value = ''
+  }
+
+  if (nodeModalAction.value === 'add-organization' && nodeModalName.value) {
+    const newOrganization = {
+      id: Date.now(),
+      name: nodeModalName.value,
+      expanded: true,
+      positions: [],
+      children: []
+    }
+
+    target.children = [...(target.children || []), newOrganization]
+  }
+
+  if (nodeModalAction.value === 'delete') {
+    organizations.value = removeOrganizationById(organizations.value, nodeModalTargetId.value)
+    ensureDashboardSelection()
+  }
+
+  closeNodeModal()
 }
 </script>
 
@@ -1133,6 +1266,85 @@ function applyTreeSearch() {
 .content-stack {
   display: grid;
   gap: 18px;
+}
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.28);
+  z-index: 100;
+}
+
+.overlay-card {
+  width: min(420px, 100%);
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(20, 36, 66, 0.18);
+}
+
+.overlay-title {
+  margin: 0;
+  color: #173156;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.overlay-text {
+  margin: 10px 0 0;
+  color: #6a7d94;
+  font-size: 13px;
+}
+
+.overlay-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.overlay-field span {
+  color: #50657f;
+  font-size: 12px;
+}
+
+.overlay-field input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  color: #173156;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  outline: none;
+}
+
+.overlay-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.overlay-button {
+  min-width: 92px;
+  height: 40px;
+  padding: 0 14px;
+  color: #ffffff;
+  font-size: 12px;
+  background: #2563eb;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.overlay-button--ghost {
+  color: #4b627d;
+  background: #eef3f9;
 }
 
 @media (max-width: 1100px) {

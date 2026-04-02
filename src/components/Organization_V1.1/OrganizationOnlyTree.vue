@@ -6,6 +6,7 @@
       :node="organization"
       :selected-org-id="selectedOrgId"
       @select-organization="$emit('select-organization', $event)"
+      @node-action="$emit('node-action', $event)"
     />
   </div>
 </template>
@@ -24,7 +25,7 @@ defineProps({
   }
 })
 
-defineEmits(['select-organization'])
+defineEmits(['select-organization', 'node-action'])
 </script>
 
 <style scoped>

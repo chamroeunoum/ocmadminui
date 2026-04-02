@@ -248,7 +248,7 @@ const filteredPermissions = computed(() => {
 }
 
 .selected .permission-check {
-  color: #16a34a;
+  color: #15803d;
 }
 
 .status-pill {
@@ -268,9 +268,9 @@ const filteredPermissions = computed(() => {
 }
 
 .status-pill.active {
-  color: #16a34a;
-  background: #eafaf0;
-  border-color: #bfe7cd;
+  color: #166534;
+  background: #bbf7d0;
+  border-color: #4ade80;
 }
 
 .empty-state {

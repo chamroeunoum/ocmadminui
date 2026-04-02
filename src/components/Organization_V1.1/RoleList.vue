@@ -183,7 +183,7 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 }
 
 .role-row.selected .role-check {
-  color: #16a34a;
+  color: #15803d;
 }
 
 .role-row__body {
@@ -247,9 +247,9 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 }
 
 .status-pill.active {
-  color: #16a34a;
-  background: #eafaf0;
-  border-color: #bfe7cd;
+  color: #166534;
+  background: #bbf7d0;
+  border-color: #4ade80;
 }
 
 @media (max-width: 900px) {

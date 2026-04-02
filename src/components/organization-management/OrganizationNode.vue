@@ -31,9 +31,35 @@
             <h3 class="font-sr">{{ node.name }}</h3>
           </div>
 
-          <div v-if="hasChildren" class="org-meta">
-            <span class="meta-count">{{ childCount }}</span>
-            <span class="meta-label font-sr">{{ childCount === 1 ? '1 អង្គភាពរង' : `${childCount} អង្គភាពរង` }}</span>
+          <div class="node-menu-wrap">
+            <button
+              type="button"
+              class="node-menu-trigger"
+              @click.stop="toggleMenu"
+            >
+              ...
+            </button>
+
+            <div v-if="isMenuOpen" class="node-menu">
+              <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-position')">
+                <span class="node-menu__icon">
+                  <HugeiconsIcon :icon="UserCircleIcon" :size="15" />
+                </span>
+                <span>បន្ថែមតួនាទី</span>
+              </button>
+              <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-organization')">
+                <span class="node-menu__icon">
+                  <HugeiconsIcon :icon="Building02Icon" :size="15" />
+                </span>
+                <span>បន្ថែមអង្គភាព</span>
+              </button>
+              <button type="button" class="node-menu__item node-menu__item--danger font-sr" @click.stop="emitNodeAction('delete')">
+                <span class="node-menu__icon">
+                  <HugeiconsIcon :icon="MinusSignIcon" :size="15" />
+                </span>
+                <span>លុប</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -66,6 +92,7 @@
         :node="child"
         :selected-position-id="selectedPositionId"
         @select-position="$emit('select-position', $event)"
+        @node-action="$emit('node-action', $event)"
       />
     </div>
   </div>
@@ -101,10 +128,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['select-position'])
+const emit = defineEmits(['select-position', 'node-action'])
 
 // Root level starts open so the page feels populated on first load.
 const isOpen = ref(props.node.expanded ?? props.level === 0)
+const isMenuOpen = ref(false)
 
 const hasChildren = computed(() => (props.node.children || []).length > 0)
 const hasPositions = computed(() => (props.node.positions || []).length > 0)
@@ -112,7 +140,6 @@ const hasExpandableContent = computed(() => hasChildren.value || hasPositions.va
 const showPositions = computed(() => {
   return hasPositions.value && isOpen.value
 })
-const childCount = computed(() => (props.node.children || []).length)
 const containsSelectedPosition = computed(() => {
   return checkSelectedBranch(props.node, props.selectedPositionId)
 })
@@ -144,6 +171,18 @@ function toggleNode() {
 
 function selectPosition(position) {
   emit('select-position', position)
+}
+
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
+function emitNodeAction(action) {
+  isMenuOpen.value = false
+  emit('node-action', {
+    action,
+    node: props.node
+  })
 }
 
 watch(
@@ -231,29 +270,88 @@ watch(
   min-width: 0;
 }
 
-.org-meta {
+.node-menu-wrap {
+  position: relative;
+  margin-left: 8px;
+}
+
+.node-menu-trigger {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7d95;
+  font-size: 16px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.org-title:hover .node-menu-trigger,
+.node-menu-wrap:hover .node-menu-trigger,
+.node-menu-wrap:focus-within .node-menu-trigger,
+.node-menu-trigger:focus-visible,
+.node-menu-trigger:active {
+  opacity: 1;
+}
+
+.node-menu-trigger:hover {
+  background: #eef3f9;
+}
+
+.node-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 148px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(20, 36, 66, 0.12);
+  z-index: 30;
+}
+
+.node-menu__item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  padding-left: 8px;
+  padding: 8px 10px;
+  color: #334861;
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.node-menu__icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f77a2;
   flex-shrink: 0;
 }
 
-.meta-count {
-  color: #c4ccda;
-  font-size: 11px;
-  font-weight: 700;
+.node-menu__item:hover {
+  background: #f3f7fc;
 }
 
-.meta-label {
-  color: #c4ccda;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
+.node-menu__item--danger {
+  color: #c0392b;
+}
+
+.node-menu__item--danger .node-menu__icon {
+  color: #c0392b;
 }
 
 .node-icon {
@@ -376,8 +474,5 @@ watch(
     flex-direction: column;
   }
 
-  .org-meta {
-    justify-content: flex-start;
-  }
 }
 </style>

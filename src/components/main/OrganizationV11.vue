@@ -7,6 +7,20 @@
             <div>
               <p class="eyebrow font-moul">អង្គភាព V1.1</p>
               <h2 class="panel-title font-moul">បញ្ជីអង្គភាព</h2>
+              <form class="tree-search" @submit.prevent="applyTreeSearch">
+                <label class="tree-search-field">
+                  <HugeiconsIcon :icon="Search02Icon" class="tree-search-icon" :size="18" />
+                  <input
+                    v-model.trim="treeSearchInput"
+                    type="text"
+                    placeholder="ស្វែងរកអង្គភាព"
+                  >
+                </label>
+
+                <button type="submit" class="tree-search-button font-moul">
+                  ស្វែងរក
+                </button>
+              </form>
               <p class="section-description font-sr">
                 ជ្រើសរើសអង្គភាពមួយ ដើម្បីគ្រប់គ្រងតំណែង អ្នកប្រើប្រាស់ តួនាទី និងសិទ្ធិប្រើប្រាស់។
               </p>
@@ -17,9 +31,10 @@
 
           <div class="tree-scroll">
             <OrganizationOnlyTree
-              :organizations="organizations"
+              :organizations="filteredOrganizations"
               :selected-org-id="selectedOrganization.id"
               @select-organization="handleOrganizationSelect"
+              @node-action="handleNodeAction"
             />
           </div>
         </section>
@@ -112,10 +127,29 @@
         </div>
       </section>
     </div>
+
+    <div v-if="isNodeModalOpen" class="overlay-backdrop" @click="closeNodeModal">
+      <div class="overlay-card" @click.stop>
+        <h3 class="overlay-title font-moul">{{ modalTitle }}</h3>
+        <p class="overlay-text font-sr">{{ modalDescription }}</p>
+
+        <label v-if="nodeModalAction !== 'delete'" class="overlay-field">
+          <span class="font-sr">{{ nodeModalAction === 'add-position' ? 'ឈ្មោះតួនាទី' : 'ឈ្មោះអង្គភាព' }}</span>
+          <input v-model.trim="nodeModalName" type="text">
+        </label>
+
+        <div class="overlay-actions">
+          <button type="button" class="overlay-button overlay-button--ghost font-sr" @click="closeNodeModal">បិទ</button>
+          <button type="button" class="overlay-button font-sr" @click="submitNodeAction">រក្សាទុក</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { Search02Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/vue'
 import { computed, ref } from 'vue'
 import OrganizationOnlyTree from '@/components/Organization_V1.1/OrganizationOnlyTree.vue'
 import PermissionList from '@/components/Organization_V1.1/PermissionList.vue'
@@ -534,6 +568,12 @@ const activeSystem = ref('erp')
 const selectedOrganizationId = ref(1)
 const selectedPositionId = ref(11)
 const selectedUserEmail = ref('sarah.jenkins@globalcorp.com')
+const treeSearchInput = ref('')
+const treeSearchKeyword = ref('')
+const isNodeModalOpen = ref(false)
+const nodeModalAction = ref('')
+const nodeModalTargetId = ref(null)
+const nodeModalName = ref('')
 
 function getAllOrganizations(items) {
   return items.flatMap((item) => [
@@ -541,6 +581,31 @@ function getAllOrganizations(items) {
     ...getAllOrganizations(item.children || [])
   ])
 }
+
+function filterOrganizations(items, keyword) {
+  if (!keyword) {
+    return items
+  }
+
+  return items.reduce((result, item) => {
+    const matches = item.name.toLowerCase().includes(keyword.toLowerCase())
+    const matchingChildren = filterOrganizations(item.children || [], keyword)
+
+    if (matches || matchingChildren.length) {
+      result.push({
+        ...item,
+        expanded: true,
+        children: matchingChildren
+      })
+    }
+
+    return result
+  }, [])
+}
+
+const filteredOrganizations = computed(() => {
+  return filterOrganizations(organizations.value, treeSearchKeyword.value)
+})
 
 const selectedOrganization = computed(() => {
   const allOrganizations = getAllOrganizations(organizations.value)
@@ -570,6 +635,26 @@ const currentAccess = computed(() => {
 
 const totalOrganizations = computed(() => {
   return getAllOrganizations(organizations.value).length
+})
+
+const modalTitle = computed(() => {
+  if (nodeModalAction.value === 'add-position') {
+    return 'បន្ថែមតួនាទី'
+  }
+
+  if (nodeModalAction.value === 'add-organization') {
+    return 'បន្ថែមអង្គភាព'
+  }
+
+  return 'លុបអង្គភាព'
+})
+
+const modalDescription = computed(() => {
+  if (nodeModalAction.value === 'delete') {
+    return 'តើអ្នកចង់លុបអង្គភាពនេះមែនទេ?'
+  }
+
+  return 'សូមបំពេញព័ត៌មានខាងក្រោម។'
 })
 
 function handleOrganizationSelect(organization) {
@@ -640,6 +725,99 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
   access.permissionIds = assign
     ? Array.from(new Set([...access.permissionIds, ...permissionIds]))
     : access.permissionIds.filter((id) => !permissionIds.includes(id))
+}
+
+function applyTreeSearch() {
+  treeSearchKeyword.value = treeSearchInput.value
+}
+
+function findOrganizationById(items, id) {
+  for (const item of items) {
+    if (item.id === id) {
+      return item
+    }
+
+    const match = findOrganizationById(item.children || [], id)
+    if (match) {
+      return match
+    }
+  }
+
+  return null
+}
+
+function removeOrganizationById(items, id) {
+  return items
+    .filter((item) => item.id !== id)
+    .map((item) => ({
+      ...item,
+      children: removeOrganizationById(item.children || [], id)
+    }))
+}
+
+function ensureOrganizationSelection() {
+  const allOrganizations = getAllOrganizations(organizations.value)
+  const currentOrganization = allOrganizations.find((item) => item.id === selectedOrganizationId.value)
+  const fallbackOrganization = currentOrganization || allOrganizations[0] || null
+
+  selectedOrganizationId.value = fallbackOrganization?.id || null
+  selectedPositionId.value = fallbackOrganization?.positions?.[0]?.id || null
+  selectedUserEmail.value = fallbackOrganization?.positions?.[0]?.people?.[0]?.email || ''
+}
+
+function handleNodeAction({ action, node }) {
+  nodeModalAction.value = action
+  nodeModalTargetId.value = node.id
+  nodeModalName.value = ''
+  isNodeModalOpen.value = true
+}
+
+function closeNodeModal() {
+  isNodeModalOpen.value = false
+  nodeModalAction.value = ''
+  nodeModalTargetId.value = null
+  nodeModalName.value = ''
+}
+
+function submitNodeAction() {
+  const target = findOrganizationById(organizations.value, nodeModalTargetId.value)
+
+  if (!target) {
+    closeNodeModal()
+    return
+  }
+
+  if (nodeModalAction.value === 'add-position' && nodeModalName.value) {
+    const newPosition = {
+      id: Date.now(),
+      name: nodeModalName.value,
+      people: []
+    }
+
+    target.positions = [...(target.positions || []), newPosition]
+    selectedOrganizationId.value = target.id
+    selectedPositionId.value = newPosition.id
+    selectedUserEmail.value = ''
+  }
+
+  if (nodeModalAction.value === 'add-organization' && nodeModalName.value) {
+    const newOrganization = {
+      id: Date.now(),
+      name: nodeModalName.value,
+      expanded: true,
+      positions: [],
+      children: []
+    }
+
+    target.children = [...(target.children || []), newOrganization]
+  }
+
+  if (nodeModalAction.value === 'delete') {
+    organizations.value = removeOrganizationById(organizations.value, nodeModalTargetId.value)
+    ensureOrganizationSelection()
+  }
+
+  closeNodeModal()
 }
 </script>
 
@@ -750,6 +928,53 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
   min-height: 0;
   overflow-y: auto;
   padding-right: 6px;
+}
+
+.tree-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.tree-search-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  background: #f8fbff;
+  border: 1px solid #dce4ee;
+  border-radius: 14px;
+}
+
+.tree-search-field input {
+  width: 100%;
+  color: #1b2b42;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.tree-search-icon {
+  width: 17px;
+  height: 17px;
+  color: #7a8ca4;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.tree-search-button {
+  min-width: 92px;
+  padding: 0 16px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  background: linear-gradient(180deg, #3d63f6 0%, #2d52d9 100%);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
 }
 
 .positions-block,
@@ -886,6 +1111,85 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
   gap: 18px;
 }
 
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.28);
+  z-index: 100;
+}
+
+.overlay-card {
+  width: min(420px, 100%);
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(20, 36, 66, 0.18);
+}
+
+.overlay-title {
+  margin: 0;
+  color: #173156;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.overlay-text {
+  margin: 10px 0 0;
+  color: #6a7d94;
+  font-size: 13px;
+}
+
+.overlay-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.overlay-field span {
+  color: #50657f;
+  font-size: 12px;
+}
+
+.overlay-field input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  color: #173156;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  outline: none;
+}
+
+.overlay-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.overlay-button {
+  min-width: 92px;
+  height: 40px;
+  padding: 0 14px;
+  color: #ffffff;
+  font-size: 12px;
+  background: #2563eb;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.overlay-button--ghost {
+  color: #4b627d;
+  background: #eef3f9;
+}
+
 @media (max-width: 1100px) {
   .dashboard-layout {
     flex-direction: column;
@@ -908,6 +1212,10 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
   .position-grid,
   .user-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tree-search {
+    flex-direction: column;
   }
 }
 </style>
