@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { getRoutes } from './plugins/Route'
+import { isAuth } from './plugins/Authentication'
 let routes = getRoutes()
 const router = createRouter({
     history: createWebHashHistory(),
@@ -8,11 +9,14 @@ const router = createRouter({
 
 // Meta Handling
 router.beforeEach((to, from) => {
-    // Return false to cancel navigation
-    // if (!isAuthenticated) {
-    //     return false
-    // }
-    // Return true to allow navigation
+    if (to.meta.requiresAuth && !isAuth()) {
+        return '/login'
+    }
+
+    if (to.name === 'Login' && isAuth()) {
+        return '/dashboard'
+    }
+
     return true
 })
 

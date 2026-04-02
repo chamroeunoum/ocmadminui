@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
+    "@hugeicons/core-free-icons": "^4.1.1",
+    "@hugeicons/vue": "^1.0.5",
     "@tailwindcss/vite": "^4.2.2",
     "@vicons/ionicons5": "^0.13.0",
     "axios": "^1.14.0",
