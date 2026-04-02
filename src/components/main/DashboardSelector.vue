@@ -1,8 +1,8 @@
 <template>
   <div class="selector-page font-sr">
     <div class="selector-card">
-      <p class="selector-eyebrow font-moul">ការគ្រប់គ្រងអង្គភាព</p>
-      <h1 class="selector-title font-moul">ជ្រើសរើសកំណែប្រើប្រាស់</h1>
+      <p class="selector-eyebrow font-sr">ការគ្រប់គ្រងអង្គភាព</p>
+      <h1 class="selector-title font-sr">ជ្រើសរើសកំណែប្រើប្រាស់</h1>
       <p class="selector-description font-sr">
         ជ្រើសរើសទម្រង់អង្គភាពដែលអ្នកចង់បើកបន្ទាប់ពីចូលប្រព័ន្ធរួច។
       </p>
@@ -13,7 +13,7 @@
           class="selector-button"
           @click="router.push('/dashboard/organization-v1')"
         >
-          <span class="selector-button__label font-moul">ការគ្រប់គ្រងអង្គភាព V1</span>
+          <span class="selector-button__label font-sr">ការគ្រប់គ្រងអង្គភាព V1</span>
           <span class="selector-button__text font-sr">បើកផ្ទាំងគ្រប់គ្រងអង្គភាពកំណែបច្ចុប្បន្ន។</span>
         </button>
 
@@ -22,8 +22,17 @@
           class="selector-button selector-button--alt"
           @click="router.push('/dashboard/organization-v1-1')"
         >
-          <span class="selector-button__label font-moul">ការគ្រប់គ្រងអង្គភាព V1.1</span>
+          <span class="selector-button__label font-sr">ការគ្រប់គ្រងអង្គភាព V1.1</span>
           <span class="selector-button__text font-sr">បើកផ្ទាំងគ្រប់គ្រងអង្គភាពកំណែថ្មី។</span>
+        </button>
+
+        <button
+          type="button"
+          class="selector-button selector-button--hr"
+          @click="router.push('/dashboard/hr')"
+        >
+          <span class="selector-button__label font-sr">HR</span>
+          <span class="selector-button__text font-sr">បើកផ្ទាំងសម្រាប់ការងារធនធានមនុស្ស។</span>
         </button>
       </div>
     </div>
@@ -64,7 +73,7 @@ const router = useRouter()
   margin: 0 0 8px;
   color: #2753c7;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -73,7 +82,7 @@ const router = useRouter()
   margin: 0;
   color: #163153;
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .selector-description {
@@ -85,7 +94,7 @@ const router = useRouter()
 
 .selector-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
   margin-top: 28px;
 }
@@ -113,10 +122,15 @@ const router = useRouter()
   background: linear-gradient(180deg, #f5f9ff 0%, #edf4ff 100%);
 }
 
+.selector-button--hr {
+  background: linear-gradient(180deg, #eefcf7 0%, #e4f8ef 100%);
+  border-color: #cdeedc;
+}
+
 .selector-button__label {
   color: #163153;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.35;
 }
 
