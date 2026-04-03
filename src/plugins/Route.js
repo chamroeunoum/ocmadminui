@@ -6,6 +6,9 @@ import DashboardWidget from '../components/main/Dashboard.vue'
 import DashboardSelector from '../components/main/DashboardSelector.vue'
 import OrganizationV11 from '../components/main/OrganizationV11.vue'
 
+import RoleManagementComponent from '@components/role/Index.vue'
+import RoleContentComponent from '@components/role/list/Content.vue'
+
 /**
  * Error
  */
@@ -69,6 +72,28 @@ export const getRoutes = () => {
                     name: 'DashboardWidgetsV11' ,
                     path: 'organization-v1-1',
                     component: OrganizationV11 ,
+                    meta : {
+                        transition: 'slide-left' ,
+                        requiresAuth: true
+                    }
+                }
+            ]
+        },/**
+         * Dashboard
+         */
+        {
+            name: "RoleManagement" ,
+            path: '/role',
+            component: RoleManagementComponent,
+            meta: {
+                transition: 'slide-left' ,
+                requiresAuth: true
+            },
+            children: [
+                {
+                    name: 'RoleContent' ,
+                    path: '',
+                    component: RoleContentComponent ,
                     meta : {
                         transition: 'slide-left' ,
                         requiresAuth: true
