@@ -4,36 +4,54 @@
       <div class="section-title-row">
         <HugeiconsIcon :icon="Shield01Icon" class="section-icon" :size="22" />
         <div>
-          <h3 class="card-title">Roles in {{ systemName }}</h3>
-          <p class="section-note">Select one or more roles for the current holder.</p>
+          <h3 class="card-title font-moul">តួនាទីក្នុង {{ systemName }}</h3>
+          <p class="section-note font-sr">ជ្រើសរើសតួនាទីមួយ ឬច្រើនសម្រាប់អ្នកប្រើប្រាស់ដែលបានជ្រើស។</p>
         </div>
       </div>
 
-      <span class="assigned-badge">Assigned: {{ assignedCount }}</span>
+      <span class="assigned-badge font-sr">បានជ្រើស {{ assignedCount }}</span>
     </div>
 
-    <div class="role-grid">
+    <div class="role-list">
       <button
         v-for="role in roles"
         :key="role.id"
         type="button"
-        class="role-card"
+        class="role-row"
         :class="{ selected: assignedRoleIds.includes(role.id) }"
         @click="$emit('toggle-role', role.id)"
       >
-        <div class="role-copy">
-          <span v-if="assignedRoleIds.includes(role.id)" class="role-tag role-tag--active">Assigned</span>
-          <h4>{{ role.name }}</h4>
-          <p>{{ role.description }}</p>
+        <div class="role-row__left">
+          <span class="role-check">
+            <HugeiconsIcon
+              :icon="assignedRoleIds.includes(role.id) ? CheckmarkCircle02Icon : CircleIcon"
+              :size="18"
+            />
+          </span>
         </div>
 
-        <span class="role-action">
-          <HugeiconsIcon
-            :icon="assignedRoleIds.includes(role.id) ? CheckmarkCircle02Icon : CircleIcon"
-            class="role-status-icon"
-            :size="18"
-          />
-        </span>
+        <div class="role-row__body">
+          <div class="role-row__top">
+            <strong class="font-moul">{{ role.name }}</strong>
+            <span
+              class="status-pill"
+              :class="{ active: assignedRoleIds.includes(role.id) }"
+              :aria-label="assignedRoleIds.includes(role.id) ? 'selected' : 'not selected'"
+            />
+          </div>
+
+          <p class="font-sr">{{ role.description }}</p>
+
+          <div class="role-permissions">
+            <span
+              v-for="permission in role.permissions || []"
+              :key="permission"
+              class="role-permissions__chip font-sr"
+            >
+              {{ permission }}
+            </span>
+          </div>
+        </div>
       </button>
     </div>
   </section>
@@ -72,7 +90,7 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 }
 
 .info-panel {
-  padding: 18px 18px 20px;
+  padding: 16px;
   background: #ffffff;
   border: 1px solid #dce4ee;
   border-radius: 20px;
@@ -84,7 +102,7 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .section-title-row {
@@ -96,17 +114,21 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 .section-icon {
   width: 22px;
   height: 22px;
-  color: #3d5afe;
+  color: #2563eb;
+  background: #e8f0ff;
+  border: 1px solid #cddcff;
+  border-radius: 10px;
+  padding: 5px;
   stroke-width: 1.9;
 }
 
 .card-title {
   margin: 0 0 4px;
   color: #0f274a;
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.01em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .section-note {
@@ -117,97 +139,124 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 
 .assigned-badge {
   padding: 6px 10px;
-  color: #3d5afe;
+  color: #2563eb;
   font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 500;
   background: #e9f0ff;
   border-radius: 999px;
+  text-transform: none;
 }
 
-.role-grid {
+.role-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.role-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #dfe7f0;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.role-row.selected {
+  background: #eef5ff;
+  border-color: #c7d9ff;
+}
+
+.role-row__left {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.role-check {
+  color: #bcc8d8;
+  display: inline-flex;
+  align-items: center;
+}
+
+.role-row.selected .role-check {
+  color: #15803d;
+}
+
+.role-row__body {
+  min-width: 0;
+}
+
+.role-row__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
 }
 
-.role-card {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: flex-start;
-  min-height: 86px;
-  padding: 18px 16px;
-  text-align: left;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+.role-row__top strong {
+  color: #173156;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.role-card.selected {
-  border-color: #7ea7ff;
-  box-shadow: 0 0 0 2px rgba(84, 133, 255, 0.1);
-}
-
-.role-copy {
-  flex: 1;
-}
-
-.role-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  margin-bottom: 8px;
-  color: #3d5afe;
-  font-size: 11px;
-  font-weight: 700;
-  background: #eef3ff;
-  border-radius: 999px;
-  text-transform: uppercase;
-}
-
-.role-tag--active {
-  background: #e9f0ff;
-}
-
-.role-card h4 {
-  margin: 0 0 6px;
-  color: #193355;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.role-card p {
-  margin: 0;
-  color: #64758a;
-  font-size: 14px;
+.role-row__body p {
+  margin: 8px 0 0;
+  color: #66788f;
+  font-size: 12px;
+  font-weight: 400;
   line-height: 1.6;
 }
 
-.role-status-icon {
-  width: 18px;
-  height: 18px;
-  color: #3d5afe;
-  stroke-width: 1.8;
-  flex-shrink: 0;
+.role-permissions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
 }
 
-.role-action {
+.role-permissions__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  color: #51657f;
+  font-size: 11px;
+  font-weight: 400;
+  background: #f5f7fa;
+  border: 1px solid #e1e7ef;
+  border-radius: 999px;
+}
+
+.status-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: #f4f7fc;
-  border-radius: 10px;
-  flex-shrink: 0;
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  padding: 0;
+  color: transparent;
+  font-size: 0;
+  font-weight: 400;
+  background: #f3f5f8;
+  border: 1px solid #dfe5ed;
+  border-radius: 999px;
+}
+
+.status-pill.active {
+  color: #166534;
+  background: #bbf7d0;
+  border-color: #4ade80;
 }
 
 @media (max-width: 900px) {
-  .role-grid {
-    grid-template-columns: 1fr;
+  .section-header,
+  .role-row__top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

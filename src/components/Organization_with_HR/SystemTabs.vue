@@ -11,7 +11,6 @@
       <span class="tab-icon">
         <HugeiconsIcon v-if="system.key === 'erp'" :icon="Building02Icon" class="tab-svg" :size="16" />
         <HugeiconsIcon v-else-if="system.key === 'hr'" :icon="IdentificationIcon" class="tab-svg" :size="16" />
-        <HugeiconsIcon v-else-if="system.key === 'organization'" :icon="UserGroupIcon" class="tab-svg" :size="16" />
         <HugeiconsIcon v-else :icon="UserGroupIcon" class="tab-svg" :size="16" />
       </span>
       <span class="font-moul">{{ system.name }}</span>
@@ -108,11 +107,6 @@ function updateSystem(value) {
 }
 
 .tab-button:nth-child(3) .tab-icon {
-  color: #8b5cf6;
-  background: #f3e8ff;
-}
-
-.tab-button:nth-child(4) .tab-icon {
   color: #f08a1f;
   background: #fff4e9;
 }

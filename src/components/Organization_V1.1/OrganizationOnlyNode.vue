@@ -27,17 +27,49 @@
         />
       </button>
 
-      <button
-        type="button"
-        class="org-title"
-        :class="{ 'org-title--active': node.id === selectedOrgId }"
-        @click="$emit('select-organization', node)"
-      >
-        <span class="node-icon">
-          <HugeiconsIcon :icon="Building02Icon" :size="16" />
-        </span>
-        <span class="org-name">{{ node.name }}</span>
-      </button>
+      <div class="org-title" :class="{ 'org-title--active': node.id === selectedOrgId }">
+        <button
+          type="button"
+          class="org-title-button"
+          @click="$emit('select-organization', node)"
+        >
+          <span class="node-icon">
+            <HugeiconsIcon :icon="Building02Icon" :size="16" />
+          </span>
+          <span class="org-name font-sr">{{ node.name }}</span>
+        </button>
+
+        <div class="node-menu-wrap">
+          <button
+            type="button"
+            class="node-menu-trigger"
+            @click.stop="toggleMenu"
+          >
+            ...
+          </button>
+
+          <div v-if="isMenuOpen" class="node-menu">
+            <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-position')">
+              <span class="node-menu__icon">
+                <HugeiconsIcon :icon="UserCircleIcon" :size="15" />
+              </span>
+              <span>បន្ថែមតួនាទី</span>
+            </button>
+            <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-organization')">
+              <span class="node-menu__icon">
+                <HugeiconsIcon :icon="Building02Icon" :size="15" />
+              </span>
+              <span>បន្ថែមអង្គភាព</span>
+            </button>
+            <button type="button" class="node-menu__item node-menu__item--danger font-sr" @click.stop="emitNodeAction('delete')">
+              <span class="node-menu__icon">
+                <HugeiconsIcon :icon="MinusSignIcon" :size="15" />
+              </span>
+              <span>លុប</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="hasChildren && isOpen" class="children-list">
@@ -48,6 +80,7 @@
         :node="child"
         :selected-org-id="selectedOrgId"
         @select-organization="$emit('select-organization', $event)"
+        @node-action="$emit('node-action', $event)"
       />
     </div>
   </div>
@@ -58,7 +91,8 @@ import {
   ArrowDown01Icon,
   ArrowRight01Icon,
   Building02Icon,
-  MinusSignIcon
+  MinusSignIcon,
+  UserCircleIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { computed, ref, watch } from 'vue'
@@ -82,9 +116,10 @@ const props = defineProps({
   }
 })
 
-defineEmits(['select-organization'])
+const emit = defineEmits(['select-organization', 'node-action'])
 
 const isOpen = ref(props.node.expanded ?? props.level === 0)
+const isMenuOpen = ref(false)
 const hasChildren = computed(() => (props.node.children || []).length > 0)
 
 function containsSelectedOrg(item, selectedId) {
@@ -105,6 +140,18 @@ function toggleNode() {
   }
 
   isOpen.value = !isOpen.value
+}
+
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
+function emitNodeAction(action) {
+  isMenuOpen.value = false
+  emit('node-action', {
+    action,
+    node: props.node
+  })
 }
 
 watch(
@@ -160,6 +207,7 @@ watch(
 .org-title {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   width: 100%;
   padding: 6px 8px;
@@ -167,6 +215,18 @@ watch(
   background: transparent;
   border: none;
   border-radius: 10px;
+}
+
+.org-title-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
   cursor: pointer;
 }
 
@@ -180,19 +240,104 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #2563eb;
+  color: #1d4ed8;
   background: linear-gradient(180deg, #eef5ff 0%, #dce9ff 100%);
   border: 1px solid #c9dbff;
   border-radius: 6px;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.14);
 }
 
 .org-name {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.node-menu-wrap {
+  position: relative;
+  margin-left: 8px;
+}
+
+.node-menu-trigger {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7d95;
+  font-size: 16px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.org-title:hover .node-menu-trigger,
+.node-menu-wrap:hover .node-menu-trigger,
+.node-menu-wrap:focus-within .node-menu-trigger,
+.node-menu-trigger:focus-visible,
+.node-menu-trigger:active {
+  opacity: 1;
+}
+
+.node-menu-trigger:hover {
+  background: #eef3f9;
+}
+
+.node-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 148px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(20, 36, 66, 0.12);
+  z-index: 30;
+}
+
+.node-menu__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  color: #334861;
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.node-menu__icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f77a2;
+  flex-shrink: 0;
+}
+
+.node-menu__item:hover {
+  background: #f3f7fc;
+}
+
+.node-menu__item--danger {
+  color: #c0392b;
+}
+
+.node-menu__item--danger .node-menu__icon {
+  color: #c0392b;
 }
 
 .children-list {

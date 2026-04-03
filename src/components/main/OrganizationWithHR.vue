@@ -125,10 +125,10 @@
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { Search02Icon } from '@hugeicons/core-free-icons'
 import { computed, ref } from 'vue'
-import OrganizationTree from '@/components/organization-management/OrganizationTree.vue'
-import PermissionList from '@/components/organization-management/PermissionList.vue'
-import RoleList from '@/components/organization-management/RoleList.vue'
-import SystemTabs from '@/components/organization-management/SystemTabs.vue'
+import OrganizationTree from '@/components/Organization_with_HR/OrganizationTree.vue'
+import PermissionList from '@/components/Organization_with_HR/PermissionList.vue'
+import RoleList from '@/components/Organization_with_HR/RoleList.vue'
+import SystemTabs from '@/components/Organization_with_HR/SystemTabs.vue'
 
 // Mock data keeps this page simple for now.
 // Later, you can replace it with axios calls such as:
