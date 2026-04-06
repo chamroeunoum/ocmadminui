@@ -65,11 +65,10 @@
 
         <div v-if="showPositions" class="positions-section">
           <div class="positions-list">
-            <button
+            <div
               v-for="position in node.positions"
               :key="position.id"
-              type="button"
-              class="position-row item"
+              class="position-row"
               :class="{ 'active-item': position.id === selectedPositionId }"
               @click="selectPosition(position)"
             >
@@ -78,7 +77,30 @@
                 <HugeiconsIcon :icon="UserCircleIcon" class="position-svg" :size="15" />
               </span>
               <strong class="font-sr">{{ position.name }}</strong>
-            </button>
+
+              <div class="position-menu-wrap">
+                <button
+                  type="button"
+                  class="position-menu-trigger"
+                  @click.stop="togglePositionMenu(position.id)"
+                >
+                  ...
+                </button>
+
+                <div v-if="openPositionMenuId === position.id" class="position-menu">
+                  <button
+                    type="button"
+                    class="node-menu__item node-menu__item--danger font-sr"
+                    @click.stop="emitDeletePosition(position)"
+                  >
+                    <span class="node-menu__icon">
+                      <HugeiconsIcon :icon="MinusSignIcon" :size="15" />
+                    </span>
+                    <span>លុប</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -133,6 +155,7 @@ const emit = defineEmits(['select-position', 'node-action'])
 // Root level starts open so the page feels populated on first load.
 const isOpen = ref(props.node.expanded ?? props.level === 0)
 const isMenuOpen = ref(false)
+const openPositionMenuId = ref(null)
 
 const hasChildren = computed(() => (props.node.children || []).length > 0)
 const hasPositions = computed(() => (props.node.positions || []).length > 0)
@@ -175,6 +198,19 @@ function selectPosition(position) {
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value
+}
+
+function togglePositionMenu(positionId) {
+  openPositionMenuId.value = openPositionMenuId.value === positionId ? null : positionId
+}
+
+function emitDeletePosition(position) {
+  openPositionMenuId.value = null
+  emit('node-action', {
+    action: 'delete-position',
+    node: props.node,
+    position
+  })
 }
 
 function emitNodeAction(action) {
@@ -409,6 +445,57 @@ watch(
   transition: background-color 0.2s ease, border-radius 0.2s ease, color 0.2s ease;
 }
 
+.position-row strong {
+  flex: 1;
+  min-width: 0;
+}
+
+.position-menu-wrap {
+  position: relative;
+}
+
+.position-menu-trigger {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7d95;
+  font-size: 14px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.position-row:hover .position-menu-trigger,
+.position-menu-wrap:hover .position-menu-trigger,
+.position-menu-wrap:focus-within .position-menu-trigger,
+.position-menu-trigger:focus-visible,
+.position-menu-trigger:active {
+  opacity: 1;
+}
+
+.position-menu-trigger:hover {
+  background: #eef3f9;
+}
+
+.position-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 110px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(20, 36, 66, 0.12);
+  z-index: 30;
+}
+
 .active-item {
   background-color: #E3F2FD;
   border-radius: 8px;
@@ -439,7 +526,7 @@ watch(
   stroke-width: 1.8;
 }
 
-.position-row strong {
+.position-row > strong {
   color: #173156;
   font-size: 12px;
   font-weight: 700;

@@ -5,11 +5,39 @@
         <HugeiconsIcon :icon="Shield01Icon" class="section-icon" :size="22" />
         <div>
           <h3 class="card-title font-moul">តួនាទីក្នុង {{ systemName }}</h3>
-          <p class="section-note font-sr">ជ្រើសរើសតួនាទីមួយ ឬច្រើនសម្រាប់អ្នកកាន់តំណែងបច្ចុប្បន្ន។</p>
+          <p class="section-note font-sr">
+            ជ្រើសរើសតួនាទីមួយ ឬច្រើនសម្រាប់អ្នកកាន់តំណែងបច្ចុប្បន្ន។
+          </p>
         </div>
       </div>
 
-      <span class="assigned-badge font-sr">បានជ្រើស {{ assignedCount }}</span>
+      <div class="section-actions">
+        <button
+          type="button"
+          class="action-button action-button--add font-sr"
+          @click="handleAddRole"
+        >
+          បន្ថែម
+        </button>
+        <button
+          type="button"
+          class="action-button font-sr"
+          :class="{ 'action-button--active': isDeleteMode }"
+          @click="toggleDeleteMode"
+        >
+          ជ្រើសលុប
+        </button>
+        <button
+          v-if="isDeleteMode"
+          type="button"
+          class="action-button action-button--danger font-sr"
+          :disabled="!selectedRoleIdsForDelete.length"
+          @click="deleteSelectedRoles"
+        >
+          លុប ({{ selectedRoleIdsForDelete.length }})
+        </button>
+        <span class="assigned-badge font-sr">បានជ្រើស {{ assignedCount }}</span>
+      </div>
     </div>
 
     <div class="role-list">
@@ -18,13 +46,20 @@
         :key="role.id"
         type="button"
         class="role-row"
-        :class="{ selected: assignedRoleIds.includes(role.id) }"
-        @click="$emit('toggle-role', role.id)"
+        :class="{
+          selected: assignedRoleIds.includes(role.id),
+          'delete-selected': selectedRoleIdsForDelete.includes(role.id),
+        }"
+        @click="handleRoleClick(role.id)"
       >
         <div class="role-row__left">
           <span class="role-check">
             <HugeiconsIcon
-              :icon="assignedRoleIds.includes(role.id) ? CheckmarkCircle02Icon : CircleIcon"
+              :icon="
+                assignedRoleIds.includes(role.id)
+                  ? CheckmarkCircle02Icon
+                  : CircleIcon
+              "
               :size="18"
             />
           </span>
@@ -36,7 +71,9 @@
             <span
               class="status-pill"
               :class="{ active: assignedRoleIds.includes(role.id) }"
-              :aria-label="assignedRoleIds.includes(role.id) ? 'selected' : 'not selected'"
+              :aria-label="
+                assignedRoleIds.includes(role.id) ? 'selected' : 'not selected'
+              "
             />
           </div>
 
@@ -58,28 +95,68 @@
 </template>
 
 <script setup>
-import { CheckmarkCircle02Icon, CircleIcon, Shield01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/vue'
-import { computed } from 'vue'
+import {
+  CheckmarkCircle02Icon,
+  CircleIcon,
+  Shield01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
   systemName: {
     type: String,
-    default: ''
+    default: "",
   },
   roles: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   assignedRoleIds: {
     type: Array,
-    default: () => []
+    default: () => [],
+  },
+});
+
+const emit = defineEmits(["toggle-role", "add-role", "delete-roles"]);
+
+const assignedCount = computed(() => props.assignedRoleIds.length);
+const isDeleteMode = ref(false);
+const selectedRoleIdsForDelete = ref([]);
+
+function handleRoleClick(roleId) {
+  if (!isDeleteMode.value) {
+    emit("toggle-role", roleId);
+    return;
   }
-})
 
-defineEmits(['toggle-role'])
+  selectedRoleIdsForDelete.value = selectedRoleIdsForDelete.value.includes(
+    roleId,
+  )
+    ? selectedRoleIdsForDelete.value.filter((id) => id !== roleId)
+    : [...selectedRoleIdsForDelete.value, roleId];
+}
 
-const assignedCount = computed(() => props.assignedRoleIds.length)
+function toggleDeleteMode() {
+  isDeleteMode.value = !isDeleteMode.value;
+  if (!isDeleteMode.value) {
+    selectedRoleIdsForDelete.value = [];
+  }
+}
+
+function handleAddRole() {
+  emit("add-role");
+}
+
+function deleteSelectedRoles() {
+  if (!selectedRoleIdsForDelete.value.length) {
+    return;
+  }
+
+  emit("delete-roles", [...selectedRoleIdsForDelete.value]);
+  selectedRoleIdsForDelete.value = [];
+  isDeleteMode.value = false;
+}
 </script>
 
 <style scoped>
@@ -103,6 +180,14 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .section-title-row {
@@ -145,6 +230,40 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   border-radius: 999px;
 }
 
+.action-button {
+  height: 30px;
+  padding: 0 10px;
+  color: #4d617b;
+  font-size: 12px;
+  background: #eef3f9;
+  border: 1px solid #d8e2ef;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.action-button--add {
+  color: #1e4db7;
+  background: #eaf1ff;
+  border-color: #c9d9fb;
+}
+
+.action-button--active {
+  color: #173156;
+  background: #dfe9f8;
+  border-color: #b9cbe8;
+}
+
+.action-button--danger {
+  color: #a93226;
+  background: #fdeeee;
+  border-color: #f4c9c9;
+}
+
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .role-list {
   display: grid;
   gap: 10px;
@@ -165,6 +284,11 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 .role-row.selected {
   background: #eef5ff;
   border-color: #c7d9ff;
+}
+
+.role-row.delete-selected {
+  background: #fff1f1;
+  border-color: #f0b9b9;
 }
 
 .role-row__left {
