@@ -1,36 +1,97 @@
 <template>
-  <div class="flex" >
-    <div class="w-60 bg-gray-100 border border-gray-300 min-h-screen" >
-        <!-- Organizations -->
-         <div class="" ></div>
+  <section class="task-management">
+    <div class="task-layout">
+      <TaskSidebar
+        :tasks="tasks"
+        :filtered-tasks="filteredTasks"
+        :selected-task="selectedTask"
+        :selected-filter="selectedFilter"
+        :filter-options="filterOptions"
+        :status-styles="statusStyles"
+        :format-short-date="formatShortDate"
+        @create="openTaskModal()"
+        @update:selected-filter="selectedFilter = $event"
+        @select-task="selectedTaskId = $event"
+      />
+
+      <TaskDetail
+        :task="selectedTask"
+        :status-styles="statusStyles"
+        :workflow-stages="workflowStages"
+        :task-progress-value="taskProgressValue"
+        :progress-guidance="progressGuidance"
+        :format-long-date-range="formatLongDateRange"
+        @create="openTaskModal()"
+        @add-subtask="addSelectedTaskSubtask"
+        @edit="openTaskModal"
+        @delete="openDeleteModal"
+        @set-status="setSelectedTaskStatus"
+        @toggle-subtask="toggleSelectedSubtask"
+        @update-progress="updateSelectedTaskProgress"
+      />
     </div>
-    <div class="grow" >Content</div>
-  </div>
+
+    <TaskFormModal
+      :open="isTaskModalOpen"
+      :form="taskForm"
+      :errors="formErrors"
+      :filter-options="filterOptions"
+      :task-modal-eyebrow="taskModalEyebrow"
+      :task-modal-title="taskModalTitle"
+      :task-modal-description="taskModalDescription"
+      :task-modal-action-label="taskModalActionLabel"
+      @close="closeTaskModal"
+      @submit="submitTaskForm"
+    />
+
+    <DeleteTaskModal
+      :open="isDeleteModalOpen"
+      :task="selectedTask"
+      @close="closeDeleteModal"
+      @confirm="deleteSelectedTask"
+    />
+  </section>
 </template>
-<script>
-import { reactive } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
-import { useDialog, useMessage, useNotification } from 'naive-ui'
 
-export default {
-  name: "RoleContentPage" ,
-  components: {
-  },
-  setup(){
-    var store = useStore()
-    const dialog = useDialog()
-    const message = useMessage()
-    const notify = useNotification()
+<script setup>
+import './taskBoard.css'
 
-    /**
-     * Initial the data
-     */
+import DeleteTaskModal from './DeleteTaskModal.vue'
+import TaskDetail from './TaskDetail.vue'
+import TaskFormModal from './TaskFormModal.vue'
+import TaskSidebar from './TaskSidebar.vue'
+import { useTaskBoard } from './useTaskBoard'
 
-    return {
-      
-    }
-  }
-}
-
+const {
+  deleteSelectedTask,
+  filterOptions,
+  formErrors,
+  formatLongDateRange,
+  formatShortDate,
+  filteredTasks,
+  isDeleteModalOpen,
+  isTaskModalOpen,
+  addSelectedTaskSubtask,
+  openDeleteModal,
+  closeDeleteModal,
+  openTaskModal,
+  closeTaskModal,
+  progressGuidance,
+  selectedFilter,
+  selectedTask,
+  selectedTaskId,
+  setSelectedTaskStatus,
+  statusStyles,
+  submitTaskForm,
+  taskForm,
+  taskModalActionLabel,
+  taskModalDescription,
+  taskModalEyebrow,
+  taskModalTitle,
+  taskProgressValue,
+  tasks,
+  toggleSelectedSubtask,
+  updateSelectedTaskProgress,
+  workflowStages
+} = useTaskBoard()
 </script>
