@@ -68,13 +68,24 @@
         <div class="role-row__body">
           <div class="role-row__top">
             <strong class="font-moul">{{ role.name }}</strong>
-            <span
-              class="status-pill"
-              :class="{ active: assignedRoleIds.includes(role.id) }"
-              :aria-label="
-                assignedRoleIds.includes(role.id) ? 'selected' : 'not selected'
-              "
-            />
+            <div class="role-row__actions">
+              <button
+                type="button"
+                class="role-edit-button font-sr"
+                @click.stop="emit('edit-role', role)"
+              >
+                កែប្រែ
+              </button>
+              <span
+                class="status-pill"
+                :class="{ active: assignedRoleIds.includes(role.id) }"
+                :aria-label="
+                  assignedRoleIds.includes(role.id)
+                    ? 'selected'
+                    : 'not selected'
+                "
+              />
+            </div>
           </div>
 
           <p class="font-sr">{{ role.description }}</p>
@@ -118,7 +129,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["toggle-role", "add-role", "delete-roles"]);
+const emit = defineEmits([
+  "toggle-role",
+  "add-role",
+  "delete-roles",
+  "edit-role",
+]);
 
 const assignedCount = computed(() => props.assignedRoleIds.length);
 const isDeleteMode = ref(false);
@@ -317,6 +333,29 @@ function deleteSelectedRoles() {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.role-row__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-edit-button {
+  width: auto;
+  min-width: max-content;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  white-space: nowrap;
+  color: #1e4db7;
+  font-size: 11px;
+  background: #eaf1ff;
+  border: 1px solid #c9d9fb;
+  border-radius: 999px;
+  cursor: pointer;
 }
 
 .role-row__top strong {

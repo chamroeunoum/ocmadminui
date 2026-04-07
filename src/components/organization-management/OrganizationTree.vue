@@ -12,20 +12,20 @@
 </template>
 
 <script setup>
-import OrganizationNode from './OrganizationNode.vue'
+import OrganizationNode from "./OrganizationNode.vue";
 
 defineProps({
   organizations: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   selectedPositionId: {
     type: Number,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
-defineEmits(['select-position', 'node-action'])
+defineEmits(["select-position", "node-action"]);
 </script>
 
 <style scoped>
@@ -38,6 +38,6 @@ defineEmits(['select-position', 'node-action'])
 .organization-tree {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 </style>

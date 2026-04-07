@@ -67,6 +67,14 @@
                 <div class="holders-actions">
                   <button
                     type="button"
+                    class="holders-action-button font-sr"
+                    :disabled="!selectedHolder"
+                    @click="editSelectedHolder"
+                  >
+                    កែប្រែ
+                  </button>
+                  <button
+                    type="button"
                     class="holders-action-button holders-action-button--add font-sr"
                     @click="addHolderToPosition"
                   >
@@ -130,6 +138,7 @@
             @toggle-role="toggleRoleForSelectedHolder"
             @add-role="addRoleForCurrentSystem"
             @delete-roles="deleteRolesForCurrentSystem"
+            @edit-role="editRoleForCurrentSystem"
           />
 
           <PermissionList
@@ -167,6 +176,31 @@
           <span class="font-sr">{{ modalSecondaryLabel }}</span>
           <input v-model.trim="nodeModalSecondary" type="text" />
         </label>
+
+        <label v-if="showModalTertiaryField" class="overlay-field">
+          <span class="font-sr">លេខអត្តសញ្ញាណប័ណ្ណ</span>
+          <input v-model.trim="nodeModalTertiary" type="text" />
+        </label>
+
+        <div v-if="showRolePermissionPicker" class="overlay-field">
+          <span class="font-sr">ជ្រើសសិទ្ធិ</span>
+          <div class="permission-picker">
+            <button
+              v-for="permission in currentSystem.permissions"
+              :key="permission.id"
+              type="button"
+              class="permission-chip font-sr"
+              :class="{
+                'permission-chip--active': nodeModalPermissionIds.includes(
+                  permission.id,
+                ),
+              }"
+              @click="toggleRolePermission(permission.id)"
+            >
+              {{ permission.name }}
+            </button>
+          </div>
+        </div>
 
         <div class="overlay-actions">
           <button
@@ -820,8 +854,11 @@ const isNodeModalOpen = ref(false);
 const nodeModalAction = ref("");
 const nodeModalTargetId = ref(null);
 const nodeModalTargetPositionId = ref(null);
+const nodeModalTargetRoleId = ref(null);
 const nodeModalName = ref("");
 const nodeModalSecondary = ref("");
+const nodeModalTertiary = ref("");
+const nodeModalPermissionIds = ref([]);
 const isHolderDeleteMode = ref(false);
 const selectedHolderEmailsForDelete = ref([]);
 
@@ -916,16 +953,32 @@ const modalTitle = computed(() => {
     return "បន្ថែមអ្នកកាន់តំណែង";
   }
 
+  if (nodeModalAction.value === "edit-holder") {
+    return "កែប្រែអ្នកកាន់តំណែង";
+  }
+
   if (nodeModalAction.value === "add-role") {
     return "បន្ថែមតួនាទី";
+  }
+
+  if (nodeModalAction.value === "edit-role") {
+    return "កែប្រែតួនាទី";
   }
 
   if (nodeModalAction.value === "add-position") {
     return "បន្ថែមតួនាទី";
   }
 
+  if (nodeModalAction.value === "edit-position") {
+    return "កែប្រែតួនាទី";
+  }
+
   if (nodeModalAction.value === "add-organization") {
     return "បន្ថែមអង្គភាព";
+  }
+
+  if (nodeModalAction.value === "edit-organization") {
+    return "កែប្រែអង្គភាព";
   }
 
   if (nodeModalAction.value === "delete-position") {
@@ -940,8 +993,24 @@ const modalDescription = computed(() => {
     return "បញ្ចូលព័ត៌មានអ្នកកាន់តំណែងថ្មី។";
   }
 
+  if (nodeModalAction.value === "edit-holder") {
+    return "កែប្រែឈ្មោះ លេខការិយាល័យ និងលេខអត្តសញ្ញាណប័ណ្ណរបស់អ្នកកាន់តំណែង។";
+  }
+
   if (nodeModalAction.value === "add-role") {
     return "បញ្ចូលព័ត៌មានតួនាទីថ្មីសម្រាប់ប្រព័ន្ធបច្ចុប្បន្ន។";
+  }
+
+  if (nodeModalAction.value === "edit-role") {
+    return "កែប្រែព័ត៌មានតួនាទីសម្រាប់ប្រព័ន្ធបច្ចុប្បន្ន។";
+  }
+
+  if (nodeModalAction.value === "edit-position") {
+    return "កែប្រែឈ្មោះតំណែងដែលបានជ្រើសរើស។";
+  }
+
+  if (nodeModalAction.value === "edit-organization") {
+    return "កែប្រែឈ្មោះអង្គភាពដែលបានជ្រើសរើស។";
   }
 
   if (nodeModalAction.value === "delete-position") {
@@ -960,11 +1029,23 @@ const modalNameLabel = computed(() => {
     return "ឈ្មោះអ្នកកាន់តំណែង";
   }
 
+  if (nodeModalAction.value === "edit-holder") {
+    return "ឈ្មោះអ្នកកាន់តំណែង";
+  }
+
   if (nodeModalAction.value === "add-role") {
     return "ឈ្មោះតួនាទី";
   }
 
+  if (nodeModalAction.value === "edit-role") {
+    return "ឈ្មោះតួនាទី";
+  }
+
   if (nodeModalAction.value === "add-position") {
+    return "ឈ្មោះតួនាទី";
+  }
+
+  if (nodeModalAction.value === "edit-position") {
     return "ឈ្មោះតួនាទី";
   }
 
@@ -974,13 +1055,32 @@ const modalNameLabel = computed(() => {
 const showModalSecondaryField = computed(() => {
   return (
     nodeModalAction.value === "add-holder" ||
-    nodeModalAction.value === "add-role"
+    nodeModalAction.value === "edit-holder" ||
+    nodeModalAction.value === "add-role" ||
+    nodeModalAction.value === "edit-role"
+  );
+});
+
+const showModalTertiaryField = computed(() => {
+  return (
+    nodeModalAction.value === "add-holder" ||
+    nodeModalAction.value === "edit-holder"
+  );
+});
+
+const showRolePermissionPicker = computed(() => {
+  return (
+    nodeModalAction.value === "add-role" ||
+    nodeModalAction.value === "edit-role"
   );
 });
 
 const modalSecondaryLabel = computed(() => {
-  if (nodeModalAction.value === "add-holder") {
-    return "លេខបុគ្គលិក (ជាជម្រើស)";
+  if (
+    nodeModalAction.value === "add-holder" ||
+    nodeModalAction.value === "edit-holder"
+  ) {
+    return "លេខការិយាល័យ / លេខបុគ្គលិក";
   }
 
   return "ការពិពណ៌នា (ជាជម្រើស)";
@@ -1028,7 +1128,51 @@ function addHolderToPosition() {
   nodeModalAction.value = "add-holder";
   nodeModalTargetId.value = null;
   nodeModalTargetPositionId.value = selectedPosition.value.id;
+  nodeModalTargetRoleId.value = null;
   nodeModalName.value = "";
+  nodeModalSecondary.value = "";
+  nodeModalTertiary.value = "";
+  nodeModalPermissionIds.value = [];
+  isNodeModalOpen.value = true;
+}
+
+function editSelectedHolder() {
+  if (!selectedHolder.value) {
+    return;
+  }
+
+  nodeModalAction.value = "edit-holder";
+  nodeModalTargetId.value = null;
+  nodeModalTargetPositionId.value = selectedPosition.value?.id || null;
+  nodeModalTargetRoleId.value = null;
+  nodeModalName.value = selectedHolder.value.name || "";
+  nodeModalSecondary.value = selectedHolder.value.employeeId || "";
+  nodeModalTertiary.value = selectedHolder.value.nationalCardId || "";
+  nodeModalPermissionIds.value = [];
+  isNodeModalOpen.value = true;
+}
+
+function toggleRolePermission(permissionId) {
+  nodeModalPermissionIds.value = nodeModalPermissionIds.value.includes(
+    permissionId,
+  )
+    ? nodeModalPermissionIds.value.filter((id) => id !== permissionId)
+    : [...nodeModalPermissionIds.value, permissionId];
+}
+
+function editSelectedPosition() {
+  if (!selectedPosition.value) {
+    return;
+  }
+
+  nodeModalAction.value = "edit-position";
+  nodeModalTargetId.value = findOrganizationContainingPosition(
+    organizations.value,
+    selectedPosition.value.id,
+  )?.id;
+  nodeModalTargetPositionId.value = selectedPosition.value.id;
+  nodeModalTargetRoleId.value = null;
+  nodeModalName.value = selectedPosition.value.name || "";
   nodeModalSecondary.value = "";
   isNodeModalOpen.value = true;
 }
@@ -1150,8 +1294,33 @@ function addRoleForCurrentSystem() {
   nodeModalAction.value = "add-role";
   nodeModalTargetId.value = null;
   nodeModalTargetPositionId.value = null;
+  nodeModalTargetRoleId.value = null;
   nodeModalName.value = "";
   nodeModalSecondary.value = "";
+  nodeModalTertiary.value = "";
+  nodeModalPermissionIds.value = [];
+  isNodeModalOpen.value = true;
+}
+
+function editRoleForCurrentSystem(role) {
+  if (!role) {
+    return;
+  }
+
+  nodeModalAction.value = "edit-role";
+  nodeModalTargetId.value = null;
+  nodeModalTargetPositionId.value = null;
+  nodeModalTargetRoleId.value = role.id;
+  nodeModalName.value = role.name || "";
+  nodeModalSecondary.value = role.description || "";
+  nodeModalTertiary.value = "";
+  nodeModalPermissionIds.value = (role.permissions || [])
+    .map((permissionName) => {
+      return currentSystem.value.permissions.find(
+        (permission) => permission.name === permissionName,
+      )?.id;
+    })
+    .filter((id) => id !== undefined);
   isNodeModalOpen.value = true;
 }
 
@@ -1186,6 +1355,28 @@ function findOrganizationById(items, id) {
   return null;
 }
 
+function findOrganizationContainingPosition(items, positionId) {
+  for (const item of items) {
+    const hasPosition = (item.positions || []).some(
+      (position) => position.id === positionId,
+    );
+
+    if (hasPosition) {
+      return item;
+    }
+
+    const match = findOrganizationContainingPosition(
+      item.children || [],
+      positionId,
+    );
+    if (match) {
+      return match;
+    }
+  }
+
+  return null;
+}
+
 function removeOrganizationById(items, id) {
   return items
     .filter((item) => item.id !== id)
@@ -1210,8 +1401,16 @@ function handleNodeAction({ action, node, position }) {
   nodeModalAction.value = action;
   nodeModalTargetId.value = node.id;
   nodeModalTargetPositionId.value = position?.id || null;
-  nodeModalName.value = "";
+  nodeModalTargetRoleId.value = null;
+  nodeModalName.value =
+    action === "edit-organization"
+      ? node.name || ""
+      : action === "edit-position"
+        ? position?.name || ""
+        : "";
   nodeModalSecondary.value = "";
+  nodeModalTertiary.value = "";
+  nodeModalPermissionIds.value = [];
   isNodeModalOpen.value = true;
 }
 
@@ -1220,8 +1419,11 @@ function closeNodeModal() {
   nodeModalAction.value = "";
   nodeModalTargetId.value = null;
   nodeModalTargetPositionId.value = null;
+  nodeModalTargetRoleId.value = null;
   nodeModalName.value = "";
   nodeModalSecondary.value = "";
+  nodeModalTertiary.value = "";
+  nodeModalPermissionIds.value = [];
 }
 
 function submitNodeAction() {
@@ -1230,6 +1432,7 @@ function submitNodeAction() {
     const newHolder = {
       name: nodeModalName.value,
       employeeId: nodeModalSecondary.value || `EMP-${String(idSeed).slice(-4)}`,
+      nationalCardId: nodeModalTertiary.value || "",
       email: `holder.${idSeed}@globalcorp.com`,
       initials: getInitials(nodeModalName.value),
       systemAccess: {},
@@ -1244,16 +1447,55 @@ function submitNodeAction() {
     return;
   }
 
+  if (nodeModalAction.value === "edit-holder" && nodeModalName.value) {
+    if (selectedHolder.value) {
+      selectedHolder.value.name = nodeModalName.value;
+      selectedHolder.value.employeeId = nodeModalSecondary.value;
+      selectedHolder.value.nationalCardId = nodeModalTertiary.value;
+      selectedHolder.value.initials = getInitials(nodeModalName.value);
+    }
+    closeNodeModal();
+    return;
+  }
+
   if (nodeModalAction.value === "add-role" && nodeModalName.value) {
     const system = currentSystem.value;
+    const selectedPermissionNames = currentSystem.value.permissions
+      .filter((permission) =>
+        nodeModalPermissionIds.value.includes(permission.id),
+      )
+      .map((permission) => permission.name);
     const newRole = {
       id: Date.now(),
       name: nodeModalName.value,
       description: nodeModalSecondary.value || "តួនាទីថ្មី",
-      permissions: [],
+      permissions: selectedPermissionNames,
     };
 
     system.roles = [...(system.roles || []), newRole];
+    closeNodeModal();
+    return;
+  }
+
+  if (nodeModalAction.value === "edit-role" && nodeModalName.value) {
+    const system = currentSystem.value;
+    const selectedPermissionNames = currentSystem.value.permissions
+      .filter((permission) =>
+        nodeModalPermissionIds.value.includes(permission.id),
+      )
+      .map((permission) => permission.name);
+    system.roles = (system.roles || []).map((role) => {
+      if (role.id !== nodeModalTargetRoleId.value) {
+        return role;
+      }
+
+      return {
+        ...role,
+        name: nodeModalName.value,
+        description: nodeModalSecondary.value || role.description,
+        permissions: selectedPermissionNames,
+      };
+    });
     closeNodeModal();
     return;
   }
@@ -1281,6 +1523,19 @@ function submitNodeAction() {
     selectedHolderEmail.value = "";
   }
 
+  if (nodeModalAction.value === "edit-position" && nodeModalName.value) {
+    target.positions = (target.positions || []).map((position) => {
+      if (position.id !== nodeModalTargetPositionId.value) {
+        return position;
+      }
+
+      return {
+        ...position,
+        name: nodeModalName.value,
+      };
+    });
+  }
+
   if (nodeModalAction.value === "add-organization" && nodeModalName.value) {
     const newOrganization = {
       id: Date.now(),
@@ -1291,6 +1546,10 @@ function submitNodeAction() {
     };
 
     target.children = [...(target.children || []), newOrganization];
+  }
+
+  if (nodeModalAction.value === "edit-organization" && nodeModalName.value) {
+    target.name = nodeModalName.value;
   }
 
   if (nodeModalAction.value === "delete") {
@@ -1739,6 +1998,34 @@ function submitNodeAction() {
   border: 1px solid #dce4ee;
   border-radius: 12px;
   outline: none;
+}
+
+.permission-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.permission-chip {
+  height: 30px;
+  width: auto;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  color: #51657f;
+  font-size: 12px;
+  background: #f5f7fa;
+  border: 1px solid #e1e7ef;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.permission-chip--active {
+  color: #1e4db7;
+  background: #eaf1ff;
+  border-color: #c9d9fb;
 }
 
 .overlay-actions {

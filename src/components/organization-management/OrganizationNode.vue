@@ -19,14 +19,23 @@
           class="tiny-icon"
           :size="14"
         />
-        <HugeiconsIcon v-else :icon="MinusSignIcon" class="tiny-icon tiny-icon--muted" :size="14" />
+        <HugeiconsIcon
+          v-else
+          :icon="MinusSignIcon"
+          class="tiny-icon tiny-icon--muted"
+          :size="14"
+        />
       </button>
 
       <div class="org-content">
         <div class="org-title">
           <div class="org-title-main">
             <span class="node-icon">
-              <HugeiconsIcon :icon="Building02Icon" class="node-svg" :size="16" />
+              <HugeiconsIcon
+                :icon="Building02Icon"
+                class="node-svg"
+                :size="16"
+              />
             </span>
             <h3 class="font-sr">{{ node.name }}</h3>
           </div>
@@ -41,19 +50,41 @@
             </button>
 
             <div v-if="isMenuOpen" class="node-menu">
-              <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-position')">
+              <button
+                type="button"
+                class="node-menu__item font-sr"
+                @click.stop="emitNodeAction('edit-organization')"
+              >
+                <span class="node-menu__icon">
+                  <HugeiconsIcon :icon="Building02Icon" :size="15" />
+                </span>
+                <span>កែប្រែអង្គភាព</span>
+              </button>
+              <button
+                type="button"
+                class="node-menu__item font-sr"
+                @click.stop="emitNodeAction('add-position')"
+              >
                 <span class="node-menu__icon">
                   <HugeiconsIcon :icon="UserCircleIcon" :size="15" />
                 </span>
                 <span>បន្ថែមតួនាទី</span>
               </button>
-              <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-organization')">
+              <button
+                type="button"
+                class="node-menu__item font-sr"
+                @click.stop="emitNodeAction('add-organization')"
+              >
                 <span class="node-menu__icon">
                   <HugeiconsIcon :icon="Building02Icon" :size="15" />
                 </span>
                 <span>បន្ថែមអង្គភាព</span>
               </button>
-              <button type="button" class="node-menu__item node-menu__item--danger font-sr" @click.stop="emitNodeAction('delete')">
+              <button
+                type="button"
+                class="node-menu__item node-menu__item--danger font-sr"
+                @click.stop="emitNodeAction('delete')"
+              >
                 <span class="node-menu__icon">
                   <HugeiconsIcon :icon="MinusSignIcon" :size="15" />
                 </span>
@@ -72,9 +103,12 @@
               :class="{ 'active-item': position.id === selectedPositionId }"
               @click="selectPosition(position)"
             >
-              <span class="position-dash">-</span>
               <span class="position-icon">
-                <HugeiconsIcon :icon="UserCircleIcon" class="position-svg" :size="15" />
+                <HugeiconsIcon
+                  :icon="UserCircleIcon"
+                  class="position-svg"
+                  :size="15"
+                />
               </span>
               <strong class="font-sr">{{ position.name }}</strong>
 
@@ -87,7 +121,20 @@
                   ...
                 </button>
 
-                <div v-if="openPositionMenuId === position.id" class="position-menu">
+                <div
+                  v-if="openPositionMenuId === position.id"
+                  class="position-menu"
+                >
+                  <button
+                    type="button"
+                    class="node-menu__item font-sr"
+                    @click.stop="emitEditPosition(position)"
+                  >
+                    <span class="node-menu__icon">
+                      <HugeiconsIcon :icon="UserCircleIcon" :size="15" />
+                    </span>
+                    <span>កែប្រែតួនាទី</span>
+                  </button>
                   <button
                     type="button"
                     class="node-menu__item node-menu__item--danger font-sr"
@@ -126,113 +173,189 @@ import {
   ArrowRight01Icon,
   Building02Icon,
   MinusSignIcon,
-  UserCircleIcon
-} from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/vue'
-import { computed, ref, watch } from 'vue'
+  UserCircleIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 defineOptions({
-  name: 'OrganizationNode'
-})
+  name: "OrganizationNode",
+});
 
 const props = defineProps({
   node: {
     type: Object,
-    required: true
+    required: true,
   },
   level: {
     type: Number,
-    default: 0
+    default: 0,
   },
   selectedPositionId: {
     type: Number,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
-const emit = defineEmits(['select-position', 'node-action'])
+const emit = defineEmits(["select-position", "node-action"]);
 
 // Root level starts open so the page feels populated on first load.
-const isOpen = ref(props.node.expanded ?? props.level === 0)
-const isMenuOpen = ref(false)
-const openPositionMenuId = ref(null)
+const isOpen = ref(props.node.expanded ?? props.level === 0);
+const isMenuOpen = ref(false);
+const openPositionMenuId = ref(null);
+const NODE_MENU_OPENED_EVENT = "org-node-menu-opened";
+const POSITION_MENU_OPENED_EVENT = "org-position-menu-opened";
 
-const hasChildren = computed(() => (props.node.children || []).length > 0)
-const hasPositions = computed(() => (props.node.positions || []).length > 0)
-const hasExpandableContent = computed(() => hasChildren.value || hasPositions.value)
+const hasChildren = computed(() => (props.node.children || []).length > 0);
+const hasPositions = computed(() => (props.node.positions || []).length > 0);
+const hasExpandableContent = computed(
+  () => hasChildren.value || hasPositions.value,
+);
 const showPositions = computed(() => {
-  return hasPositions.value && isOpen.value
-})
+  return hasPositions.value && isOpen.value;
+});
 const containsSelectedPosition = computed(() => {
-  return checkSelectedBranch(props.node, props.selectedPositionId)
-})
+  return checkSelectedBranch(props.node, props.selectedPositionId);
+});
 const hasSelectedPositionHere = computed(() => {
-  return (props.node.positions || []).some((position) => position.id === props.selectedPositionId)
-})
+  return (props.node.positions || []).some(
+    (position) => position.id === props.selectedPositionId,
+  );
+});
 
 function checkSelectedBranch(item, selectedId) {
   if (!selectedId) {
-    return false
+    return false;
   }
 
-  const hasSelectedHere = (item.positions || []).some((position) => position.id === selectedId)
+  const hasSelectedHere = (item.positions || []).some(
+    (position) => position.id === selectedId,
+  );
 
   if (hasSelectedHere) {
-    return true
+    return true;
   }
 
-  return (item.children || []).some((child) => checkSelectedBranch(child, selectedId))
+  return (item.children || []).some((child) =>
+    checkSelectedBranch(child, selectedId),
+  );
 }
 
 function toggleNode() {
   if (!hasExpandableContent.value) {
-    return
+    return;
   }
 
-  isOpen.value = !isOpen.value
+  isOpen.value = !isOpen.value;
 }
 
 function selectPosition(position) {
-  emit('select-position', position)
+  emit("select-position", position);
 }
 
 function toggleMenu() {
-  isMenuOpen.value = !isMenuOpen.value
+  const shouldOpen = !isMenuOpen.value;
+  isMenuOpen.value = shouldOpen;
+
+  if (shouldOpen) {
+    openPositionMenuId.value = null;
+    window.dispatchEvent(
+      new CustomEvent(NODE_MENU_OPENED_EVENT, {
+        detail: {
+          nodeId: props.node.id,
+        },
+      }),
+    );
+  }
 }
 
 function togglePositionMenu(positionId) {
-  openPositionMenuId.value = openPositionMenuId.value === positionId ? null : positionId
+  const nextOpenId =
+    openPositionMenuId.value === positionId ? null : positionId;
+  openPositionMenuId.value = nextOpenId;
+
+  if (nextOpenId !== null) {
+    isMenuOpen.value = false;
+    window.dispatchEvent(
+      new CustomEvent(POSITION_MENU_OPENED_EVENT, {
+        detail: {
+          nodeId: props.node.id,
+          positionId,
+        },
+      }),
+    );
+  }
 }
 
 function emitDeletePosition(position) {
-  openPositionMenuId.value = null
-  emit('node-action', {
-    action: 'delete-position',
+  openPositionMenuId.value = null;
+  emit("node-action", {
+    action: "delete-position",
     node: props.node,
-    position
-  })
+    position,
+  });
+}
+
+function emitEditPosition(position) {
+  openPositionMenuId.value = null;
+  emit("node-action", {
+    action: "edit-position",
+    node: props.node,
+    position,
+  });
 }
 
 function emitNodeAction(action) {
-  isMenuOpen.value = false
-  emit('node-action', {
+  isMenuOpen.value = false;
+  openPositionMenuId.value = null;
+  emit("node-action", {
     action,
-    node: props.node
-  })
+    node: props.node,
+  });
 }
+
+function handleNodeMenuOpened(event) {
+  if (event.detail?.nodeId !== props.node.id) {
+    isMenuOpen.value = false;
+  }
+}
+
+function handlePositionMenuOpened(event) {
+  const isSamePositionMenu =
+    event.detail?.nodeId === props.node.id &&
+    event.detail?.positionId === openPositionMenuId.value;
+
+  if (!isSamePositionMenu) {
+    openPositionMenuId.value = null;
+    isMenuOpen.value = false;
+  }
+}
+
+onMounted(() => {
+  window.addEventListener(NODE_MENU_OPENED_EVENT, handleNodeMenuOpened);
+  window.addEventListener(POSITION_MENU_OPENED_EVENT, handlePositionMenuOpened);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener(NODE_MENU_OPENED_EVENT, handleNodeMenuOpened);
+  window.removeEventListener(
+    POSITION_MENU_OPENED_EVENT,
+    handlePositionMenuOpened,
+  );
+});
 
 watch(
   () => props.selectedPositionId,
   () => {
     if (containsSelectedPosition.value) {
-      isOpen.value = true
+      isOpen.value = true;
     }
 
     if (hasSelectedPositionHere.value) {
-      isOpen.value = true
+      isOpen.value = true;
     }
-  }
-)
+  },
+);
 </script>
 
 <style scoped>
@@ -255,6 +378,7 @@ watch(
 .org-content {
   flex: 1;
   min-width: 0;
+  margin-left: -10px;
 }
 
 .toggle-button {
@@ -280,6 +404,7 @@ watch(
 .tiny-icon {
   width: 14px;
   height: 14px;
+  transform: translateY(5px);
   color: #5f77a2;
   stroke-width: 2;
 }
@@ -293,8 +418,8 @@ watch(
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  min-height: 32px;
-  padding: 6px 8px;
+  min-height: 28px;
+  padding: 4px 8px;
   border-radius: 10px;
   transition: background-color 0.2s ease;
 }
@@ -325,7 +450,9 @@ watch(
   border-radius: 8px;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .org-title:hover .node-menu-trigger,
@@ -422,13 +549,13 @@ watch(
 }
 
 .positions-section {
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .positions-list {
   margin-left: 18px;
   display: grid;
-  gap: 4px;
+  gap: 2px;
 }
 
 .position-row {
@@ -436,13 +563,17 @@ watch(
   align-items: center;
   gap: 7px;
   width: 100%;
-  padding: 6px 8px;
+  padding: 4px 8px;
+  margin-left: -5px;
   color: #173156;
   background: transparent;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-radius 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-radius 0.2s ease,
+    color 0.2s ease;
 }
 
 .position-row strong {
@@ -468,7 +599,9 @@ watch(
   border-radius: 8px;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .position-row:hover .position-menu-trigger,
@@ -487,7 +620,8 @@ watch(
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
-  min-width: 110px;
+  width: max-content;
+  min-width: 0;
   padding: 6px;
   background: #ffffff;
   border: 1px solid #dce4ee;
@@ -497,7 +631,7 @@ watch(
 }
 
 .active-item {
-  background-color: #E3F2FD;
+  background-color: #e3f2fd;
   border-radius: 8px;
 }
 
@@ -547,12 +681,12 @@ watch(
 }
 
 .children-list {
-  margin-top: 4px;
+  margin-top: 2px;
   margin-left: 5px;
   padding-left: 10px;
   border-left: 1px solid #dce5f2;
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 @media (max-width: 720px) {
@@ -560,6 +694,5 @@ watch(
     align-items: flex-start;
     flex-direction: column;
   }
-
 }
 </style>
