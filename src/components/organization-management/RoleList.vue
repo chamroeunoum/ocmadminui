@@ -21,7 +21,7 @@
         </button>
         <button
           type="button"
-          class="action-button font-sr"
+          class="action-button action-button--select font-sr"
           :class="{ 'action-button--active': isDeleteMode }"
           @click="toggleDeleteMode"
         >
@@ -247,37 +247,59 @@ function deleteSelectedRoles() {
 }
 
 .action-button {
-  height: 30px;
-  padding: 0 10px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
   color: #4d617b;
   font-size: 12px;
-  background: #eef3f9;
-  border: 1px solid #d8e2ef;
-  border-radius: 10px;
+  font-weight: 600;
+  background: #f8fbff;
+  border: 1px solid #dce6f2;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(15, 39, 74, 0.05);
   cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease, color 0.18s ease;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 39, 74, 0.08);
 }
 
 .action-button--add {
-  color: #1e4db7;
-  background: #eaf1ff;
-  border-color: #c9d9fb;
+  color: #18794e;
+  background: #edfdf3;
+  border-color: #b7ebc9;
+  box-shadow: 0 8px 18px rgba(24, 121, 78, 0.08);
+}
+
+.action-button--select {
+  color: #b45309;
+  background: #fff7ed;
+  border-color: #fed7aa;
 }
 
 .action-button--active {
-  color: #173156;
-  background: #dfe9f8;
-  border-color: #b9cbe8;
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: #fdba74;
+  box-shadow: 0 8px 18px rgba(234, 88, 12, 0.1);
 }
 
 .action-button--danger {
-  color: #a93226;
-  background: #fdeeee;
-  border-color: #f4c9c9;
+  color: #c2410c;
+  background: #fff1f2;
+  border-color: #fecdd3;
+  box-shadow: 0 8px 18px rgba(190, 24, 93, 0.08);
 }
 
 .action-button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+  box-shadow: none;
 }
 
 .role-list {
@@ -344,18 +366,28 @@ function deleteSelectedRoles() {
 .role-edit-button {
   width: auto;
   min-width: max-content;
-  height: 24px;
+  min-height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 8px;
+  gap: 7px;
+  padding: 0 11px;
   white-space: nowrap;
-  color: #1e4db7;
+  color: #2563eb;
   font-size: 11px;
-  background: #eaf1ff;
-  border: 1px solid #c9d9fb;
+  font-weight: 600;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
   border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08);
   cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.role-edit-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.99);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
 }
 
 .role-row__top strong {

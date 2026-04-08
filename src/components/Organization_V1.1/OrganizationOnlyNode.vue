@@ -49,6 +49,12 @@
           </button>
 
           <div v-if="isMenuOpen" class="node-menu">
+            <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('edit-organization')">
+              <span class="node-menu__icon">
+                <HugeiconsIcon :icon="Building02Icon" :size="15" />
+              </span>
+              <span>កែប្រែអង្គភាព</span>
+            </button>
             <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-position')">
               <span class="node-menu__icon">
                 <HugeiconsIcon :icon="UserCircleIcon" :size="15" />

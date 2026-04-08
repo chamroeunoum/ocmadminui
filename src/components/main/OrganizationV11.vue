@@ -51,7 +51,43 @@
           <div class="positions-block">
             <div class="section-row">
               <h3 class="section-title font-moul">តំណែង</h3>
-              <span class="panel-badge font-sr">{{ selectedOrganization.positions?.length || 0 }} សរុប</span>
+              <div class="section-actions">
+                <button
+                  type="button"
+                  class="section-action-button font-sr"
+                  :disabled="!selectedPosition"
+                  @click="editSelectedPosition"
+                >
+                  កែប្រែ
+                </button>
+                <button
+                  type="button"
+                  class="section-action-button section-action-button--add font-sr"
+                  :disabled="!selectedOrganization.id"
+                  @click="addPositionToSelectedOrganization"
+                >
+                  បន្ថែម
+                </button>
+                <button
+                  type="button"
+                  class="section-action-button font-sr"
+                  :class="{ 'section-action-button--active': isPositionDeleteMode }"
+                  :disabled="!selectedOrganization.positions?.length"
+                  @click="togglePositionDeleteMode"
+                >
+                  ជ្រើសលុប
+                </button>
+                <button
+                  v-if="isPositionDeleteMode"
+                  type="button"
+                  class="section-action-button section-action-button--danger font-sr"
+                  :disabled="!selectedPositionIdsForDelete.length"
+                  @click="deleteSelectedPositions"
+                >
+                  លុប ({{ selectedPositionIdsForDelete.length }})
+                </button>
+                <span class="panel-badge font-sr">{{ selectedOrganization.positions?.length || 0 }} សរុប</span>
+              </div>
             </div>
 
             <div v-if="selectedOrganization.positions?.length" class="position-grid">
@@ -60,8 +96,11 @@
                 :key="position.id"
                 type="button"
                 class="position-card"
-                :class="{ 'position-card--active': position.id === selectedPosition.id }"
-                @click="handlePositionSelect(position)"
+                :class="{
+                  'position-card--active': position.id === selectedPosition?.id,
+                  'position-card--delete-selected': selectedPositionIdsForDelete.includes(position.id)
+                }"
+                @click="handlePositionCardClick(position)"
               >
                 <span class="position-card__name font-moul">{{ position.name }}</span>
                 <span class="position-card__meta font-sr">{{ position.people.length }} នាក់</span>
@@ -79,7 +118,42 @@
                 <h3 class="section-title font-moul">{{ selectedPosition.name }}</h3>
                 <p class="section-caption font-sr">អ្នកប្រើប្រាស់នៅក្រោមតំណែងនេះ</p>
               </div>
-              <span class="panel-badge font-sr">{{ selectedPosition.people.length }} នាក់</span>
+              <div class="section-actions">
+                <button
+                  type="button"
+                  class="section-action-button font-sr"
+                  :disabled="!selectedUser"
+                  @click="editSelectedUser"
+                >
+                  កែប្រែ
+                </button>
+                <button
+                  type="button"
+                  class="section-action-button section-action-button--add font-sr"
+                  @click="addUserToPosition"
+                >
+                  បន្ថែម
+                </button>
+                <button
+                  type="button"
+                  class="section-action-button font-sr"
+                  :class="{ 'section-action-button--active': isUserDeleteMode }"
+                  :disabled="!selectedPosition.people?.length"
+                  @click="toggleUserDeleteMode"
+                >
+                  ជ្រើសលុប
+                </button>
+                <button
+                  v-if="isUserDeleteMode"
+                  type="button"
+                  class="section-action-button section-action-button--danger font-sr"
+                  :disabled="!selectedUserEmailsForDelete.length"
+                  @click="deleteSelectedUsers"
+                >
+                  លុប ({{ selectedUserEmailsForDelete.length }})
+                </button>
+                <span class="panel-badge font-sr">{{ selectedPosition.people.length }} នាក់</span>
+              </div>
             </div>
 
             <div class="user-grid">
@@ -88,8 +162,11 @@
                 :key="user.email"
                 type="button"
                 class="user-card"
-                :class="{ 'user-card--active': user.email === selectedUserEmail }"
-                @click="handleUserSelect(user)"
+                :class="{
+                  'user-card--active': user.email === selectedUserEmail,
+                  'user-card--delete-selected': selectedUserEmailsForDelete.includes(user.email)
+                }"
+                @click="handleUserCardClick(user)"
               >
                 <div class="user-card__head">
                   <div class="holder-avatar">{{ user.initials }}</div>
@@ -115,6 +192,9 @@
             :system-name="currentSystem.name"
             :assigned-role-ids="currentAccess.roleIds"
             @toggle-role="toggleRoleForSelectedUser"
+            @add-role="addRoleForCurrentSystem"
+            @delete-roles="deleteRolesForCurrentSystem"
+            @edit-role="editRoleForCurrentSystem"
           />
 
           <PermissionList
@@ -133,10 +213,55 @@
         <h3 class="overlay-title font-moul">{{ modalTitle }}</h3>
         <p class="overlay-text font-sr">{{ modalDescription }}</p>
 
-        <label v-if="nodeModalAction !== 'delete'" class="overlay-field">
-          <span class="font-sr">{{ nodeModalAction === 'add-position' ? 'ឈ្មោះតួនាទី' : 'ឈ្មោះអង្គភាព' }}</span>
+        <label
+          v-if="nodeModalAction !== 'delete' && nodeModalAction !== 'delete-position'"
+          class="overlay-field"
+        >
+          <span class="font-sr">{{ modalNameLabel }}</span>
           <input v-model.trim="nodeModalName" type="text">
         </label>
+
+        <label v-if="showModalSecondaryField" class="overlay-field">
+          <span class="font-sr">{{ modalSecondaryLabel }}</span>
+          <input v-model.trim="nodeModalSecondary" type="text">
+        </label>
+
+        <label v-if="showModalTertiaryField" class="overlay-field">
+          <span class="font-sr">{{ modalTertiaryLabel }}</span>
+          <input v-model.trim="nodeModalTertiary" type="text">
+        </label>
+
+        <div v-if="showRoleSelector" class="overlay-field">
+          <span class="font-sr">{{ modalRoleLabel }}</span>
+          <div class="permission-picker">
+            <button
+              v-for="role in currentSystem.roles"
+              :key="role.id"
+              type="button"
+              class="permission-chip font-sr"
+              :class="{ 'permission-chip--active': nodeModalRoleIds.includes(role.id) }"
+              @click="toggleModalRole(role.id)"
+            >
+              {{ role.name }}
+            </button>
+          </div>
+        </div>
+
+        <div v-if="showRolePermissionPicker" class="overlay-field">
+          <span class="font-sr">ជ្រើសសិទ្ធិ</span>
+          <div class="permission-picker">
+            <button
+              v-for="permission in currentSystem.permissions"
+              :key="permission.id"
+              type="button"
+              class="permission-chip font-sr"
+              :class="{ 'permission-chip--active': nodeModalPermissionIds.includes(permission.id) }"
+              @click="toggleRolePermission(permission.id)"
+            >
+              {{ permission.name }}
+            </button>
+          </div>
+        </div>
 
         <div class="overlay-actions">
           <button type="button" class="overlay-button overlay-button--ghost font-sr" @click="closeNodeModal">បិទ</button>
@@ -588,13 +713,20 @@ const treeSearchKeyword = ref('')
 const isNodeModalOpen = ref(false)
 const nodeModalAction = ref('')
 const nodeModalTargetId = ref(null)
+const nodeModalTargetPositionId = ref(null)
+const nodeModalTargetRoleId = ref(null)
 const nodeModalName = ref('')
+const nodeModalSecondary = ref('')
+const nodeModalTertiary = ref('')
+const nodeModalPermissionIds = ref([])
+const nodeModalRoleIds = ref([])
+const isPositionDeleteMode = ref(false)
+const selectedPositionIdsForDelete = ref([])
+const isUserDeleteMode = ref(false)
+const selectedUserEmailsForDelete = ref([])
 
 function getAllOrganizations(items) {
-  return items.flatMap((item) => [
-    item,
-    ...getAllOrganizations(item.children || [])
-  ])
+  return items.flatMap((item) => [item, ...getAllOrganizations(item.children || [])])
 }
 
 function filterOrganizations(items, keyword) {
@@ -624,7 +756,16 @@ const filteredOrganizations = computed(() => {
 
 const selectedOrganization = computed(() => {
   const allOrganizations = getAllOrganizations(organizations.value)
-  return allOrganizations.find((item) => item.id === selectedOrganizationId.value) || allOrganizations[0]
+
+  return (
+    allOrganizations.find((item) => item.id === selectedOrganizationId.value) ||
+    allOrganizations[0] || {
+      id: null,
+      name: '',
+      positions: [],
+      children: []
+    }
+  )
 })
 
 const selectedPosition = computed(() => {
@@ -642,9 +783,11 @@ const currentSystem = computed(() => {
 })
 
 const currentAccess = computed(() => {
-  return selectedUser.value?.systemAccess?.[activeSystem.value] || {
-    roleIds: [],
-    permissionIds: []
+  const access = selectedUser.value?.systemAccess?.[activeSystem.value]
+
+  return {
+    roleIds: Array.isArray(access?.roleIds) ? access.roleIds : [],
+    permissionIds: Array.isArray(access?.permissionIds) ? access.permissionIds : []
   }
 })
 
@@ -653,18 +796,54 @@ const totalOrganizations = computed(() => {
 })
 
 const modalTitle = computed(() => {
-  if (nodeModalAction.value === 'add-position') {
+  if (nodeModalAction.value === 'add-holder') {
+    return 'បន្ថែមមន្ត្រី'
+  }
+
+  if (nodeModalAction.value === 'edit-holder') {
+    return 'កែប្រែមន្ត្រី'
+  }
+
+  if (nodeModalAction.value === 'add-role') {
     return 'បន្ថែមតួនាទី'
+  }
+
+  if (nodeModalAction.value === 'edit-role') {
+    return 'កែប្រែតួនាទី'
+  }
+
+  if (nodeModalAction.value === 'add-position') {
+    return 'បន្ថែមតំណែង'
+  }
+
+  if (nodeModalAction.value === 'edit-position') {
+    return 'កែប្រែតំណែង'
   }
 
   if (nodeModalAction.value === 'add-organization') {
     return 'បន្ថែមអង្គភាព'
   }
 
+  if (nodeModalAction.value === 'edit-organization') {
+    return 'កែប្រែអង្គភាព'
+  }
+
+  if (nodeModalAction.value === 'delete-position') {
+    return 'លុបតំណែង'
+  }
+
   return 'លុបអង្គភាព'
 })
 
 const modalDescription = computed(() => {
+  if (nodeModalAction.value === 'add-position') {
+    return 'បញ្ចូលឈ្មោះតំណែង មន្ត្រី និងតួនាទីចាប់ផ្តើមសម្រាប់ប្រព័ន្ធដែលបានជ្រើស។'
+  }
+
+  if (nodeModalAction.value === 'delete-position') {
+    return 'តើអ្នកចង់លុបតំណែងដែលបានជ្រើសនេះមែនទេ?'
+  }
+
   if (nodeModalAction.value === 'delete') {
     return 'តើអ្នកចង់លុបអង្គភាពនេះមែនទេ?'
   }
@@ -672,19 +851,212 @@ const modalDescription = computed(() => {
   return 'សូមបំពេញព័ត៌មានខាងក្រោម។'
 })
 
+const modalNameLabel = computed(() => {
+  if (nodeModalAction.value === 'add-holder' || nodeModalAction.value === 'edit-holder') {
+    return 'ឈ្មោះមន្ត្រី'
+  }
+
+  if (
+    nodeModalAction.value === 'add-role' ||
+    nodeModalAction.value === 'edit-role'
+  ) {
+    return 'ឈ្មោះតួនាទី'
+  }
+
+  if (
+    nodeModalAction.value === 'add-position' ||
+    nodeModalAction.value === 'edit-position'
+  ) {
+    return 'ឈ្មោះតំណែង'
+  }
+
+  return 'ឈ្មោះអង្គភាព'
+})
+
+const showModalSecondaryField = computed(() => {
+  return [
+    'add-holder',
+    'edit-holder',
+    'add-role',
+    'edit-role',
+    'add-position'
+  ].includes(nodeModalAction.value)
+})
+
+const showModalTertiaryField = computed(() => {
+  return ['add-holder', 'edit-holder', 'add-position'].includes(nodeModalAction.value)
+})
+
+const showRolePermissionPicker = computed(() => {
+  return ['add-role', 'edit-role'].includes(nodeModalAction.value)
+})
+
+const showRoleSelector = computed(() => {
+  return ['add-holder', 'edit-holder', 'add-position'].includes(nodeModalAction.value)
+})
+
+const modalSecondaryLabel = computed(() => {
+  if (nodeModalAction.value === 'add-role' || nodeModalAction.value === 'edit-role') {
+    return 'ការពិពណ៌នា (ជាជម្រើស)'
+  }
+
+  if (nodeModalAction.value === 'add-position') {
+    return 'ឈ្មោះមន្ត្រី'
+  }
+
+  return 'លេខបុគ្គលិក (ជាជម្រើស)'
+})
+
+const modalTertiaryLabel = computed(() => {
+  if (nodeModalAction.value === 'add-position') {
+    return 'លេខបុគ្គលិកមន្ត្រី (ជាជម្រើស)'
+  }
+
+  return 'លេខអត្តសញ្ញាណប័ណ្ណ (ជាជម្រើស)'
+})
+
+const modalRoleLabel = computed(() => {
+  return `តួនាទីក្នុង ${currentSystem.value.name}`
+})
+
+function syncSelectionForOrganization(organization, preferredPositionId = selectedPositionId.value) {
+  const positions = organization?.positions || []
+  const nextPosition =
+    positions.find((position) => position.id === preferredPositionId) ||
+    positions[0] ||
+    null
+
+  selectedPositionId.value = nextPosition?.id || null
+  selectedUserEmail.value = nextPosition?.people?.[0]?.email || ''
+}
+
+function applyTreeSearch() {
+  treeSearchKeyword.value = treeSearchInput.value
+}
+
 function handleOrganizationSelect(organization) {
   selectedOrganizationId.value = organization.id
-  selectedPositionId.value = organization.positions?.[0]?.id || null
-  selectedUserEmail.value = organization.positions?.[0]?.people?.[0]?.email || ''
+  syncSelectionForOrganization(organization)
+  isPositionDeleteMode.value = false
+  selectedPositionIdsForDelete.value = []
+  isUserDeleteMode.value = false
+  selectedUserEmailsForDelete.value = []
 }
 
 function handlePositionSelect(position) {
   selectedPositionId.value = position.id
   selectedUserEmail.value = position.people?.[0]?.email || ''
+  isUserDeleteMode.value = false
+  selectedUserEmailsForDelete.value = []
+}
+
+function handlePositionCardClick(position) {
+  if (!isPositionDeleteMode.value) {
+    handlePositionSelect(position)
+    return
+  }
+
+  selectedPositionIdsForDelete.value = selectedPositionIdsForDelete.value.includes(position.id)
+    ? selectedPositionIdsForDelete.value.filter((id) => id !== position.id)
+    : [...selectedPositionIdsForDelete.value, position.id]
+}
+
+function togglePositionDeleteMode() {
+  isPositionDeleteMode.value = !isPositionDeleteMode.value
+  if (!isPositionDeleteMode.value) {
+    selectedPositionIdsForDelete.value = []
+  }
+}
+
+function deleteSelectedPositions() {
+  if (!selectedOrganization.value.id || !selectedPositionIdsForDelete.value.length) {
+    return
+  }
+
+  selectedOrganization.value.positions = (selectedOrganization.value.positions || []).filter(
+    (position) => !selectedPositionIdsForDelete.value.includes(position.id)
+  )
+  syncSelectionForOrganization(selectedOrganization.value)
+  selectedPositionIdsForDelete.value = []
+  isPositionDeleteMode.value = false
 }
 
 function handleUserSelect(user) {
   selectedUserEmail.value = user.email
+}
+
+function handleUserCardClick(user) {
+  if (!isUserDeleteMode.value) {
+    handleUserSelect(user)
+    return
+  }
+
+  selectedUserEmailsForDelete.value = selectedUserEmailsForDelete.value.includes(user.email)
+    ? selectedUserEmailsForDelete.value.filter((email) => email !== user.email)
+    : [...selectedUserEmailsForDelete.value, user.email]
+}
+
+function toggleUserDeleteMode() {
+  isUserDeleteMode.value = !isUserDeleteMode.value
+  if (!isUserDeleteMode.value) {
+    selectedUserEmailsForDelete.value = []
+  }
+}
+
+function deleteSelectedUsers() {
+  if (!selectedPosition.value || !selectedUserEmailsForDelete.value.length) {
+    return
+  }
+
+  selectedPosition.value.people = (selectedPosition.value.people || []).filter(
+    (user) => !selectedUserEmailsForDelete.value.includes(user.email)
+  )
+  selectedUserEmail.value = selectedPosition.value.people?.[0]?.email || ''
+  selectedUserEmailsForDelete.value = []
+  isUserDeleteMode.value = false
+}
+
+function getInitials(name) {
+  return name
+    .split(' ')
+    .map((part) => part[0] || '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+}
+
+function getPermissionIdsForRoleIds(roleIds) {
+  const permissionNames = new Set(
+    (currentSystem.value.roles || [])
+      .filter((role) => roleIds.includes(role.id))
+      .flatMap((role) => role.permissions || [])
+  )
+
+  return (currentSystem.value.permissions || [])
+    .filter((permission) => permissionNames.has(permission.name))
+    .map((permission) => permission.id)
+}
+
+function buildAccessForModalRoles() {
+  return {
+    roleIds: [...nodeModalRoleIds.value],
+    permissionIds: getPermissionIdsForRoleIds(nodeModalRoleIds.value)
+  }
+}
+
+function createHolderPayload(name, employeeId, nationalCardId = '') {
+  const idSeed = Date.now()
+
+  return {
+    name,
+    employeeId: employeeId || `EMP-${String(idSeed).slice(-4)}`,
+    nationalCardId,
+    email: `holder.${idSeed}.${selectedOrganizationId.value || 0}@globalcorp.com`,
+    initials: getInitials(name),
+    systemAccess: {
+      [activeSystem.value]: buildAccessForModalRoles()
+    }
+  }
 }
 
 function ensureSelectedUserAccess() {
@@ -701,6 +1073,14 @@ function ensureSelectedUserAccess() {
       roleIds: [],
       permissionIds: []
     }
+  }
+
+  if (!Array.isArray(selectedUser.value.systemAccess[activeSystem.value].roleIds)) {
+    selectedUser.value.systemAccess[activeSystem.value].roleIds = []
+  }
+
+  if (!Array.isArray(selectedUser.value.systemAccess[activeSystem.value].permissionIds)) {
+    selectedUser.value.systemAccess[activeSystem.value].permissionIds = []
   }
 
   return selectedUser.value.systemAccess[activeSystem.value]
@@ -742,8 +1122,149 @@ function setPermissionsForSelectedUser({ permissionIds, assign }) {
     : access.permissionIds.filter((id) => !permissionIds.includes(id))
 }
 
-function applyTreeSearch() {
-  treeSearchKeyword.value = treeSearchInput.value
+function toggleRolePermission(permissionId) {
+  nodeModalPermissionIds.value = nodeModalPermissionIds.value.includes(permissionId)
+    ? nodeModalPermissionIds.value.filter((id) => id !== permissionId)
+    : [...nodeModalPermissionIds.value, permissionId]
+}
+
+function toggleModalRole(roleId) {
+  nodeModalRoleIds.value = nodeModalRoleIds.value.includes(roleId)
+    ? nodeModalRoleIds.value.filter((id) => id !== roleId)
+    : [...nodeModalRoleIds.value, roleId]
+}
+
+function removeRoleIdsFromAllAccess(removedRoleIds) {
+  const walk = (items) => {
+    for (const item of items) {
+      for (const position of item.positions || []) {
+        for (const user of position.people || []) {
+          for (const systemKey of Object.keys(user.systemAccess || {})) {
+            const access = user.systemAccess[systemKey]
+            access.roleIds = (access.roleIds || []).filter((id) => !removedRoleIds.includes(id))
+          }
+        }
+      }
+      walk(item.children || [])
+    }
+  }
+
+  walk(organizations.value)
+}
+
+function addRoleForCurrentSystem() {
+  nodeModalAction.value = 'add-role'
+  nodeModalTargetId.value = null
+  nodeModalTargetPositionId.value = null
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
+  isNodeModalOpen.value = true
+}
+
+function editRoleForCurrentSystem(role) {
+  if (!role) {
+    return
+  }
+
+  nodeModalAction.value = 'edit-role'
+  nodeModalTargetId.value = null
+  nodeModalTargetPositionId.value = null
+  nodeModalTargetRoleId.value = role.id
+  nodeModalName.value = role.name || ''
+  nodeModalSecondary.value = role.description || ''
+  nodeModalTertiary.value = ''
+  nodeModalRoleIds.value = []
+  nodeModalPermissionIds.value = (role.permissions || [])
+    .map((permissionName) => {
+      return currentSystem.value.permissions.find((permission) => permission.name === permissionName)?.id
+    })
+    .filter((id) => id !== undefined)
+  isNodeModalOpen.value = true
+}
+
+function deleteRolesForCurrentSystem(roleIds) {
+  if (!Array.isArray(roleIds) || !roleIds.length) {
+    return
+  }
+
+  currentSystem.value.roles = (currentSystem.value.roles || []).filter(
+    (role) => !roleIds.includes(role.id)
+  )
+  removeRoleIdsFromAllAccess(roleIds)
+}
+
+function addPositionToSelectedOrganization() {
+  if (!selectedOrganization.value.id) {
+    return
+  }
+
+  nodeModalAction.value = 'add-position'
+  nodeModalTargetId.value = selectedOrganization.value.id
+  nodeModalTargetPositionId.value = null
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
+  isNodeModalOpen.value = true
+}
+
+function editSelectedPosition() {
+  if (!selectedPosition.value) {
+    return
+  }
+
+  nodeModalAction.value = 'edit-position'
+  nodeModalTargetId.value = selectedOrganization.value.id
+  nodeModalTargetPositionId.value = selectedPosition.value.id
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = selectedPosition.value.name || ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
+  isNodeModalOpen.value = true
+}
+
+function addUserToPosition() {
+  if (!selectedPosition.value) {
+    return
+  }
+
+  nodeModalAction.value = 'add-holder'
+  nodeModalTargetId.value = selectedOrganization.value.id
+  nodeModalTargetPositionId.value = selectedPosition.value.id
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
+  isNodeModalOpen.value = true
+}
+
+function editSelectedUser() {
+  if (!selectedUser.value) {
+    return
+  }
+
+  nodeModalAction.value = 'edit-holder'
+  nodeModalTargetId.value = selectedOrganization.value.id
+  nodeModalTargetPositionId.value = selectedPosition.value?.id || null
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = selectedUser.value.name || ''
+  nodeModalSecondary.value = selectedUser.value.employeeId || ''
+  nodeModalTertiary.value = selectedUser.value.nationalCardId || ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = [
+    ...(selectedUser.value.systemAccess?.[activeSystem.value]?.roleIds || [])
+  ]
+  isNodeModalOpen.value = true
 }
 
 function findOrganizationById(items, id) {
@@ -776,14 +1297,19 @@ function ensureOrganizationSelection() {
   const fallbackOrganization = currentOrganization || allOrganizations[0] || null
 
   selectedOrganizationId.value = fallbackOrganization?.id || null
-  selectedPositionId.value = fallbackOrganization?.positions?.[0]?.id || null
-  selectedUserEmail.value = fallbackOrganization?.positions?.[0]?.people?.[0]?.email || ''
+  syncSelectionForOrganization(fallbackOrganization)
 }
 
 function handleNodeAction({ action, node }) {
   nodeModalAction.value = action
   nodeModalTargetId.value = node.id
-  nodeModalName.value = ''
+  nodeModalTargetPositionId.value = null
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = action === 'edit-organization' ? node.name || '' : ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
   isNodeModalOpen.value = true
 }
 
@@ -791,10 +1317,88 @@ function closeNodeModal() {
   isNodeModalOpen.value = false
   nodeModalAction.value = ''
   nodeModalTargetId.value = null
+  nodeModalTargetPositionId.value = null
+  nodeModalTargetRoleId.value = null
   nodeModalName.value = ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
 }
 
 function submitNodeAction() {
+  if (nodeModalAction.value === 'add-holder' && nodeModalName.value) {
+    if (!selectedPosition.value) {
+      return
+    }
+
+    const newUser = createHolderPayload(
+      nodeModalName.value,
+      nodeModalSecondary.value,
+      nodeModalTertiary.value
+    )
+    selectedPosition.value.people = [...(selectedPosition.value.people || []), newUser]
+    selectedUserEmail.value = newUser.email
+    closeNodeModal()
+    return
+  }
+
+  if (nodeModalAction.value === 'edit-holder' && nodeModalName.value) {
+    if (!selectedUser.value) {
+      return
+    }
+
+    selectedUser.value.name = nodeModalName.value
+    selectedUser.value.employeeId = nodeModalSecondary.value || selectedUser.value.employeeId
+    selectedUser.value.nationalCardId = nodeModalTertiary.value || ''
+    selectedUser.value.initials = getInitials(nodeModalName.value)
+    if (!selectedUser.value.systemAccess) {
+      selectedUser.value.systemAccess = {}
+    }
+    selectedUser.value.systemAccess[activeSystem.value] = buildAccessForModalRoles()
+    closeNodeModal()
+    return
+  }
+
+  if (nodeModalAction.value === 'add-role' && nodeModalName.value) {
+    const selectedPermissionNames = currentSystem.value.permissions
+      .filter((permission) => nodeModalPermissionIds.value.includes(permission.id))
+      .map((permission) => permission.name)
+
+    currentSystem.value.roles = [
+      ...(currentSystem.value.roles || []),
+      {
+        id: Date.now(),
+        name: nodeModalName.value,
+        description: nodeModalSecondary.value || 'តួនាទីថ្មី',
+        permissions: selectedPermissionNames
+      }
+    ]
+    closeNodeModal()
+    return
+  }
+
+  if (nodeModalAction.value === 'edit-role' && nodeModalName.value) {
+    const selectedPermissionNames = currentSystem.value.permissions
+      .filter((permission) => nodeModalPermissionIds.value.includes(permission.id))
+      .map((permission) => permission.name)
+
+    currentSystem.value.roles = (currentSystem.value.roles || []).map((role) => {
+      if (role.id !== nodeModalTargetRoleId.value) {
+        return role
+      }
+
+      return {
+        ...role,
+        name: nodeModalName.value,
+        description: nodeModalSecondary.value || role.description,
+        permissions: selectedPermissionNames
+      }
+    })
+    closeNodeModal()
+    return
+  }
+
   const target = findOrganizationById(organizations.value, nodeModalTargetId.value)
 
   if (!target) {
@@ -802,29 +1406,52 @@ function submitNodeAction() {
     return
   }
 
-  if (nodeModalAction.value === 'add-position' && nodeModalName.value) {
+  if (nodeModalAction.value === 'add-position') {
+    if (!nodeModalName.value || !nodeModalSecondary.value) {
+      return
+    }
+
+    const newUser = createHolderPayload(nodeModalSecondary.value, nodeModalTertiary.value)
     const newPosition = {
       id: Date.now(),
       name: nodeModalName.value,
-      people: []
+      people: [newUser]
     }
 
     target.positions = [...(target.positions || []), newPosition]
     selectedOrganizationId.value = target.id
     selectedPositionId.value = newPosition.id
-    selectedUserEmail.value = ''
+    selectedUserEmail.value = newUser.email
+  }
+
+  if (nodeModalAction.value === 'edit-position' && nodeModalName.value) {
+    target.positions = (target.positions || []).map((position) => {
+      if (position.id !== nodeModalTargetPositionId.value) {
+        return position
+      }
+
+      return {
+        ...position,
+        name: nodeModalName.value
+      }
+    })
   }
 
   if (nodeModalAction.value === 'add-organization' && nodeModalName.value) {
-    const newOrganization = {
-      id: Date.now(),
-      name: nodeModalName.value,
-      expanded: true,
-      positions: [],
-      children: []
-    }
+    target.children = [
+      ...(target.children || []),
+      {
+        id: Date.now(),
+        name: nodeModalName.value,
+        expanded: true,
+        positions: [],
+        children: []
+      }
+    ]
+  }
 
-    target.children = [...(target.children || []), newOrganization]
+  if (nodeModalAction.value === 'edit-organization' && nodeModalName.value) {
+    target.name = nodeModalName.value
   }
 
   if (nodeModalAction.value === 'delete') {
@@ -1005,6 +1632,61 @@ function submitNodeAction() {
   margin-bottom: 14px;
 }
 
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.section-action-button {
+  min-height: 34px;
+  padding: 0 12px;
+  color: #4d617b;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f8fbff;
+  border: 1px solid #dce6f2;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(15, 39, 74, 0.05);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease, color 0.18s ease;
+}
+
+.section-action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 39, 74, 0.08);
+}
+
+.section-action-button--add {
+  color: #18794e;
+  background: #edfdf3;
+  border-color: #b7ebc9;
+  box-shadow: 0 8px 18px rgba(24, 121, 78, 0.08);
+}
+
+.section-action-button--active {
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: #fdba74;
+  box-shadow: 0 8px 18px rgba(234, 88, 12, 0.1);
+}
+
+.section-action-button--danger {
+  color: #c2410c;
+  background: #fff1f2;
+  border-color: #fecdd3;
+  box-shadow: 0 8px 18px rgba(190, 24, 93, 0.08);
+}
+
+.section-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .section-title {
   margin: 0;
   color: #163153;
@@ -1043,6 +1725,11 @@ function submitNodeAction() {
   box-shadow: 0 0 0 2px rgba(84, 133, 255, 0.1);
 }
 
+.position-card--delete-selected {
+  background: #fff3f2;
+  border-color: #f2b1ab;
+}
+
 .position-card__name {
   color: #163153;
   font-size: 14px;
@@ -1075,6 +1762,11 @@ function submitNodeAction() {
   background: #eef4ff;
   border-color: #c8d7f4;
   box-shadow: 0 0 0 2px rgba(84, 133, 255, 0.1);
+}
+
+.user-card--delete-selected {
+  background: #fff3f2;
+  border-color: #f2b1ab;
 }
 
 .user-card__head {
@@ -1138,7 +1830,7 @@ function submitNodeAction() {
 }
 
 .overlay-card {
-  width: min(420px, 100%);
+  width: min(560px, 100%);
   padding: 18px;
   background: #ffffff;
   border: 1px solid #dce4ee;
@@ -1179,6 +1871,29 @@ function submitNodeAction() {
   border: 1px solid #dce4ee;
   border-radius: 12px;
   outline: none;
+}
+
+.permission-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.permission-chip {
+  min-height: 34px;
+  padding: 6px 12px;
+  color: #51657f;
+  font-size: 12px;
+  background: #f5f7fa;
+  border: 1px solid #e1e7ef;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.permission-chip--active {
+  color: #1d4ed8;
+  background: #e8f0ff;
+  border-color: #c9dbff;
 }
 
 .overlay-actions {
@@ -1231,6 +1946,15 @@ function submitNodeAction() {
 
   .tree-search {
     flex-direction: column;
+  }
+
+  .section-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-actions {
+    justify-content: flex-start;
   }
 }
 </style>

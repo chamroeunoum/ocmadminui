@@ -5,11 +5,39 @@
         <HugeiconsIcon :icon="Shield01Icon" class="section-icon" :size="22" />
         <div>
           <h3 class="card-title font-moul">តួនាទីក្នុង {{ systemName }}</h3>
-          <p class="section-note font-sr">ជ្រើសរើសតួនាទីមួយ ឬច្រើនសម្រាប់អ្នកប្រើប្រាស់ដែលបានជ្រើស។</p>
+          <p class="section-note font-sr">
+            ជ្រើសរើសតួនាទីមួយ ឬច្រើនសម្រាប់អ្នកប្រើប្រាស់ដែលបានជ្រើស។
+          </p>
         </div>
       </div>
 
-      <span class="assigned-badge font-sr">បានជ្រើស {{ assignedCount }}</span>
+      <div class="section-actions">
+        <button
+          type="button"
+          class="action-button action-button--add font-sr"
+          @click="handleAddRole"
+        >
+          បន្ថែម
+        </button>
+        <button
+          type="button"
+          class="action-button action-button--select font-sr"
+          :class="{ 'action-button--active': isDeleteMode }"
+          @click="toggleDeleteMode"
+        >
+          ជ្រើសលុប
+        </button>
+        <button
+          v-if="isDeleteMode"
+          type="button"
+          class="action-button action-button--danger font-sr"
+          :disabled="!selectedRoleIdsForDelete.length"
+          @click="deleteSelectedRoles"
+        >
+          លុប ({{ selectedRoleIdsForDelete.length }})
+        </button>
+        <span class="assigned-badge font-sr">បានជ្រើស {{ assignedCount }}</span>
+      </div>
     </div>
 
     <div class="role-list">
@@ -18,13 +46,20 @@
         :key="role.id"
         type="button"
         class="role-row"
-        :class="{ selected: assignedRoleIds.includes(role.id) }"
-        @click="$emit('toggle-role', role.id)"
+        :class="{
+          selected: assignedRoleIds.includes(role.id),
+          'delete-selected': selectedRoleIdsForDelete.includes(role.id),
+        }"
+        @click="handleRoleClick(role.id)"
       >
         <div class="role-row__left">
           <span class="role-check">
             <HugeiconsIcon
-              :icon="assignedRoleIds.includes(role.id) ? CheckmarkCircle02Icon : CircleIcon"
+              :icon="
+                assignedRoleIds.includes(role.id)
+                  ? CheckmarkCircle02Icon
+                  : CircleIcon
+              "
               :size="18"
             />
           </span>
@@ -33,11 +68,22 @@
         <div class="role-row__body">
           <div class="role-row__top">
             <strong class="font-moul">{{ role.name }}</strong>
-            <span
-              class="status-pill"
-              :class="{ active: assignedRoleIds.includes(role.id) }"
-              :aria-label="assignedRoleIds.includes(role.id) ? 'selected' : 'not selected'"
-            />
+            <div class="role-row__actions">
+              <button
+                type="button"
+                class="role-edit-button font-sr"
+                @click.stop="emit('edit-role', role)"
+              >
+                កែប្រែ
+              </button>
+              <span
+                class="status-pill"
+                :class="{ active: assignedRoleIds.includes(role.id) }"
+                :aria-label="
+                  assignedRoleIds.includes(role.id) ? 'selected' : 'not selected'
+                "
+              />
+            </div>
           </div>
 
           <p class="font-sr">{{ role.description }}</p>
@@ -58,28 +104,73 @@
 </template>
 
 <script setup>
-import { CheckmarkCircle02Icon, CircleIcon, Shield01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/vue'
-import { computed } from 'vue'
+import {
+  CheckmarkCircle02Icon,
+  CircleIcon,
+  Shield01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
   systemName: {
     type: String,
-    default: ''
+    default: "",
   },
   roles: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   assignedRoleIds: {
     type: Array,
-    default: () => []
+    default: () => [],
+  },
+});
+
+const emit = defineEmits([
+  "toggle-role",
+  "add-role",
+  "delete-roles",
+  "edit-role",
+]);
+
+const assignedCount = computed(() => props.assignedRoleIds.length);
+const isDeleteMode = ref(false);
+const selectedRoleIdsForDelete = ref([]);
+
+function handleRoleClick(roleId) {
+  if (!isDeleteMode.value) {
+    emit("toggle-role", roleId);
+    return;
   }
-})
 
-defineEmits(['toggle-role'])
+  selectedRoleIdsForDelete.value = selectedRoleIdsForDelete.value.includes(
+    roleId,
+  )
+    ? selectedRoleIdsForDelete.value.filter((id) => id !== roleId)
+    : [...selectedRoleIdsForDelete.value, roleId];
+}
 
-const assignedCount = computed(() => props.assignedRoleIds.length)
+function toggleDeleteMode() {
+  isDeleteMode.value = !isDeleteMode.value;
+  if (!isDeleteMode.value) {
+    selectedRoleIdsForDelete.value = [];
+  }
+}
+
+function handleAddRole() {
+  emit("add-role");
+}
+
+function deleteSelectedRoles() {
+  if (!selectedRoleIdsForDelete.value.length) {
+    return;
+  }
+
+  emit("delete-roles", [...selectedRoleIdsForDelete.value]);
+  selectedRoleIdsForDelete.value = [];
+  isDeleteMode.value = false;
+}
 </script>
 
 <style scoped>
@@ -103,6 +194,14 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .section-title-row {
@@ -144,7 +243,62 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   font-weight: 500;
   background: #e9f0ff;
   border-radius: 999px;
-  text-transform: none;
+}
+
+.action-button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  color: #4d617b;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f8fbff;
+  border: 1px solid #dce6f2;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(15, 39, 74, 0.05);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease, color 0.18s ease;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 39, 74, 0.08);
+}
+
+.action-button--add {
+  color: #18794e;
+  background: #edfdf3;
+  border-color: #b7ebc9;
+  box-shadow: 0 8px 18px rgba(24, 121, 78, 0.08);
+}
+
+.action-button--select {
+  color: #b45309;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.action-button--active {
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: #fdba74;
+  box-shadow: 0 8px 18px rgba(234, 88, 12, 0.1);
+}
+
+.action-button--danger {
+  color: #c2410c;
+  background: #fff1f2;
+  border-color: #fecdd3;
+  box-shadow: 0 8px 18px rgba(190, 24, 93, 0.08);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .role-list {
@@ -167,6 +321,11 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
 .role-row.selected {
   background: #eef5ff;
   border-color: #c7d9ff;
+}
+
+.role-row.delete-selected {
+  background: #fff3f2;
+  border-color: #f2b1ab;
 }
 
 .role-row__left {
@@ -195,6 +354,36 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.role-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.role-edit-button {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 600;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.role-edit-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.99);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.12);
 }
 
 .role-row__top strong {
@@ -238,22 +427,24 @@ const assignedCount = computed(() => props.assignedRoleIds.length)
   min-width: 12px;
   height: 12px;
   padding: 0;
-  color: transparent;
-  font-size: 0;
-  font-weight: 400;
-  background: #f3f5f8;
-  border: 1px solid #dfe5ed;
+  background: #d7dfe9;
   border-radius: 999px;
 }
 
 .status-pill.active {
-  color: #166534;
-  background: #bbf7d0;
-  border-color: #4ade80;
+  background: #22c55e;
 }
 
-@media (max-width: 900px) {
-  .section-header,
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-actions {
+    justify-content: flex-start;
+  }
+
   .role-row__top {
     flex-direction: column;
     align-items: flex-start;
