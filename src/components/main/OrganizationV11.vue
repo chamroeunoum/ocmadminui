@@ -24,6 +24,25 @@
               <p class="section-description font-sr">
                 ជ្រើសរើសអង្គភាពមួយ ដើម្បីគ្រប់គ្រងតំណែង អ្នកប្រើប្រាស់ តួនាទី និងសិទ្ធិប្រើប្រាស់។
               </p>
+
+              <div class="tree-actions">
+                <button
+                  type="button"
+                  class="tree-action-button tree-action-button--add font-sr"
+                  :disabled="!selectedOrganization.id"
+                  @click="addPositionToSelectedOrganization"
+                >
+                  បន្ថែមតួនាទី
+                </button>
+                <button
+                  type="button"
+                  class="tree-action-button font-sr"
+                  :disabled="!selectedOrganization.id"
+                  @click="openAddOrganizationFromSelected"
+                >
+                  បន្ថែមអង្គភាព
+                </button>
+              </div>
             </div>
 
             <span class="panel-badge font-sr">{{ totalOrganizations }} អង្គភាព</span>
@@ -1214,6 +1233,23 @@ function addPositionToSelectedOrganization() {
   isNodeModalOpen.value = true
 }
 
+function openAddOrganizationFromSelected() {
+  if (!selectedOrganization.value.id) {
+    return
+  }
+
+  nodeModalAction.value = 'add-organization'
+  nodeModalTargetId.value = selectedOrganization.value.id
+  nodeModalTargetPositionId.value = null
+  nodeModalTargetRoleId.value = null
+  nodeModalName.value = ''
+  nodeModalSecondary.value = ''
+  nodeModalTertiary.value = ''
+  nodeModalPermissionIds.value = []
+  nodeModalRoleIds.value = []
+  isNodeModalOpen.value = true
+}
+
 function editSelectedPosition() {
   if (!selectedPosition.value) {
     return
@@ -1576,6 +1612,47 @@ function submitNodeAction() {
   display: flex;
   gap: 10px;
   margin-bottom: 16px;
+}
+
+.tree-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.tree-action-button {
+  min-height: 34px;
+  padding: 0 12px;
+  color: #4d617b;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f8fbff;
+  border: 1px solid #dce6f2;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(15, 39, 74, 0.05);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease, color 0.18s ease;
+}
+
+.tree-action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 39, 74, 0.08);
+}
+
+.tree-action-button--add {
+  color: #18794e;
+  background: #edfdf3;
+  border-color: #b7ebc9;
+  box-shadow: 0 8px 18px rgba(24, 121, 78, 0.08);
+}
+
+.tree-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .tree-search-field {

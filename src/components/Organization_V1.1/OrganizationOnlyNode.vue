@@ -55,12 +55,12 @@
               </span>
               <span>កែប្រែអង្គភាព</span>
             </button>
-            <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-position')">
+            <!-- <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-position')">
               <span class="node-menu__icon">
                 <HugeiconsIcon :icon="UserCircleIcon" :size="15" />
               </span>
               <span>បន្ថែមតួនាទី</span>
-            </button>
+            </button> -->
             <button type="button" class="node-menu__item font-sr" @click.stop="emitNodeAction('add-organization')">
               <span class="node-menu__icon">
                 <HugeiconsIcon :icon="Building02Icon" :size="15" />
